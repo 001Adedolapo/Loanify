@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Access | SSE Bank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module" src="app.js"></script>
+</head>
+<body class="bg-slate-50 font-sans h-screen flex items-center justify-center p-6">
+
+    <div class="bg-white w-full max-w-4xl grid md:grid-cols-2 rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+        
+        <div class="bg-blue-700 p-12 text-white flex flex-col justify-between hidden md:flex">
+            <div>
+                <h2 class="text-3xl font-bold">SSE BANK</h2>
+                <p class="mt-4 text-blue-100 leading-relaxed">Join thousands of entrepreneurs managing their finances with the world's most secure digital bank.</p>
+            </div>
+            <div class="space-y-4">
+                <div class="flex items-center space-x-3">
+                    <span class="bg-blue-500 p-2 rounded-lg">✓</span>
+                    <span class="text-sm">Instant Account Opening</span>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <span class="bg-blue-500 p-2 rounded-lg">✓</span>
+                    <span class="text-sm">Secure Data Encryption</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="p-8 md:p-12">
+            <div class="mb-10">
+                <h3 class="text-2xl font-bold text-slate-800" id="formTitle">Create Account</h3>
+                <p class="text-slate-500 text-sm mt-2" id="formSub">Start your journey with SSE Bank today.</p>
+            </div>
+
+            <form id="authForm" class="space-y-5">
+                <div id="nameContainer">
+                    <label class="block text-sm font-semibold text-slate-700">Full Name</label>
+                    <input type="text" id="fullName" placeholder="John Doe" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">Email Address</label>
+                    <input type="email" id="email" required placeholder="name@company.com" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                </div>
+
+                <button type="submit" class="w-full bg-blue-700 text-white p-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg mt-4">
+                    Continue
+                </button>
+            </form>
+
+            <div class="mt-8 text-center text-sm">
+                <span class="text-slate-500" id="toggleText">Already have an account?</span>
+                <button onclick="toggleAuth()" class="text-blue-700 font-bold ml-1 hover:underline" id="toggleBtn">Login here</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

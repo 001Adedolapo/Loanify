@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | SSE Bank</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<style>
+    @keyframes shimmer {
+        0% { background-position: -468px 0; }
+        100% { background-position: 468px 0; }
+    }
+    .skeleton {
+        background: #f6f7f8;
+        background-image: linear-gradient(to right, #f6f7f8 0%, #edeef1 20%, #f6f7f8 40%, #f6f7f8 100%);
+        background-repeat: no-repeat;
+        background-size: 800px 104px;
+        display: inline-block;
+        position: relative;
+        animation-duration: 1.2s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: shimmer;
+        animation-timing-function: linear;
+    }
+    /* Toast Animation */
+    @keyframes bounce-in {
+        0% { transform: translate(-50%, 100%); opacity: 0; }
+        60% { transform: translate(-50%, -20px); opacity: 1; }
+        100% { transform: translate(-50%, 0); }
+    }
+    .animate-bounce-in { animation: bounce-in 0.5s ease-out forwards; }
+    
+    /* Card Flip Effect */
+    .perspective-1000 { perspective: 1000px; }
+    .card-inner {
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+    .card-flip:hover .card-inner { transform: rotateY(180deg); }
+    .card-front, .card-back {
+        backface-visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+    }
+    .card-back { transform: rotateY(180deg); }
+</style>
+
+<body class="bg-slate-50 font-sans">
+
+    <div id="verifyEmailBanner" class="hidden bg-amber-500 text-white text-center py-2 px-4 text-xs font-bold animate-pulse">
+        <i class="fas fa-exclamation-triangle mr-2"></i> 
+        Email not verified! Please check your inbox to secure your account.
+    </div>
+
+    <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] space-y-3 w-full max-w-xs pointer-events-none"></div>
+
+    <nav class="bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center sticky top-0 z-10">
+        <div class="text-xl font-bold text-blue-700">SSE<span class="text-slate-800">BANK</span></div>
+        <div class="flex items-center space-x-4">
+            <div onclick="openSettings()" class="text-right cursor-pointer hover:opacity-80 transition-all">
+                <p id="userNameDisplay" class="text-slate-600 font-bold text-sm">User</p>
+                <p class="text-blue-600 text-[11px] font-bold font-mono uppercase bg-blue-50 px-2 py-1 rounded">ID: <span id="accNumberDisplay">Generating...</span></p>
+            </div>
+            <button id="logoutBtn" class="text-red-500 text-sm font-bold hover:underline">Logout</button>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto p-6 mt-8">
+        <div class="grid md:grid-cols-3 gap-6 mb-10">
+            <div class="md:col-span-2 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
+                <div class="relative z-10">
+                    <p class="text-blue-100 text-sm opacity-80 uppercase tracking-wider font-bold">Total Available Balance</p>
+                    <h1 class="text-5xl font-black mt-2">$<span id="balanceDisplay">0.00</span></h1>
+                    
+                    <div class="mt-6 flex items-center gap-2 bg-white/10 w-fit px-3 py-2 rounded-lg border border-white/20">
+                        <span class="text-xs font-mono text-blue-100">ACCT: <span id="mainAccNo" class="text-white font-bold tracking-widest">Generating...</span></span>
+                        <button onclick="copyAcc()" class="text-[10px] bg-white text-blue-900 px-2 py-1 rounded font-bold uppercase">Copy</button>
+                    </div>
+
+                    <div class="flex mt-8 space-x-3 overflow-x-auto pb-2">
+                        <button id="transferBtn" class="shrink-0 bg-white text-blue-800 px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-blue-50 transition">Transfer</button>
+                        <button id="depositBtn" class="shrink-0 bg-blue-600/40 border border-blue-400/30 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-blue-600/60 transition">Deposit</button>
+                        <button onclick="toggleLoan(true)" class="shrink-0 bg-amber-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-amber-600 transition">Apply for Loan</button>
+                    </div>
+                </div>
+                <i class="fas fa-university absolute -bottom-10 -right-10 text-9xl text-white/5 rotate-12"></i>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <h3 class="text-slate-800 font-bold mb-4">Account Status</h3>
+                <div class="space-y-4 text-sm">
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-slate-500 font-bold">Tier</span>
+                        <span id="tierBadge" class="text-blue-600 font-black cursor-pointer hover:underline">LEVEL 1</span>
+                    </div>
+                    <div class="flex justify-between border-b pb-2">
+                        <span class="text-slate-500 font-bold">Security</span>
+                        <span id="pinStatus" class="text-slate-400 font-bold italic">Checking...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-slate-500 font-bold">Status</span>
+                        <span id="statusDisplay" class="text-orange-500 font-bold">Active</span>
+                    </div>
+                </div>
+                <button onclick="openSettings()" class="w-full mt-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Update Profile</button>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <div class="perspective-1000 h-[240px]">
+                <div class="card-inner relative w-full h-full cursor-pointer shadow-2xl rounded-[2rem]">
+                    <div class="card-front bg-slate-900 p-8 rounded-[2rem] text-white overflow-hidden">
+                        <div class="flex justify-between items-start mb-12">
+                            <div class="text-xl font-black italic">SSE <span class="text-blue-500">PLATINUM</span></div>
+                            <i class="fas fa-wifi rotate-90 text-slate-600"></i>
+                        </div>
+                        <div id="vCardNumber" class="text-2xl tracking-[0.3em] font-mono mb-8">•••• •••• •••• ••••</div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Card Holder</p>
+                                <p id="vCardHolder" class="text-lg font-bold">USER</p>
+                            </div>
+                            <div class="flex -space-x-3">
+                                <div class="w-10 h-10 rounded-full bg-red-500/90"></div>
+                                <div class="w-10 h-10 rounded-full bg-yellow-500/90"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="window.createVirtualCard()" class="w-full mt-4 text-xs font-black text-blue-600 uppercase tracking-tighter hover:text-blue-800 transition">
+                    <i class="fas fa-plus-circle mr-1"></i> Generate New Virtual Card
+                </button>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="font-bold text-slate-800">Financial Overview</h3>
+                    <div class="flex gap-2">
+                        <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">INFLOW</span>
+                        <span class="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">OUTFLOW</span>
+                    </div>
+                </div>
+                <div class="h-[180px] w-full">
+                    <canvas id="analyticsChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <div class="p-6 border-b border-slate-100 space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="font-bold text-slate-800">Transaction History</h3>
+                    <i class="fas fa-history text-slate-300"></i>
+                </div>
+                <div class="relative">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="txnSearch" placeholder="Search transactions..." class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 transition">
+                </div>
+            </div>
+            <div id="transactionList" class="p-4 space-y-3">
+                <p class="text-center text-slate-400 py-10">No recent activity</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="loanModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full">
+            <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-hand-holding-usd"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 text-center mb-2">Loan Application</h2>
+            <p class="text-slate-500 text-sm text-center mb-6">Apply for an instant credit limit based on your account activity.</p>
+            <form id="loanForm" class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Desired Amount ($)</label>
+                    <input type="number" id="loanAmount" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold focus:ring-2 focus:ring-amber-500/20" placeholder="0.00" required>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Repayment Period</label>
+                    <select id="loanTenure" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-medium focus:ring-2 focus:ring-amber-500/20">
+                        <option value="3">3 Months (5% Interest)</option>
+                        <option value="6">6 Months (8% Interest)</option>
+                        <option value="12">12 Months (12% Interest)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-lg hover:bg-amber-600 transition">Submit Application</button>
+                <button type="button" onclick="toggleLoan(false)" class="w-full text-slate-400 text-sm font-bold">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="kycModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Upgrade to Tier 2</h2>
+            <p class="text-slate-500 text-sm mb-6">Verify your identity to unlock higher limits and premium banking features.</p>
+            <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 mb-6 hover:border-blue-400 transition cursor-pointer group">
+                <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 group-hover:text-blue-400 mb-2"></i>
+                <p class="text-xs font-bold text-slate-400 group-hover:text-blue-500">Upload ID Card or Passport</p>
+            </div>
+            <button id="submitKyc" class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">Verify Identity</button>
+            <button onclick="toggleModal('kycModal', false)" class="mt-4 text-slate-400 text-sm font-bold">Maybe Later</button>
+        </div>
+    </div>
+
+    <div id="successModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-white/90 backdrop-blur-sm">
+        <div class="text-center">
+            <div class="w-24 h-24 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                <i class="fas fa-check text-5xl"></i>
+            </div>
+            <h2 class="text-2xl font-black text-slate-800">Transfer Successful!</h2>
+            <p class="text-slate-500">Your funds have been delivered.</p>
+        </div>
+    </div>
+
+    <div id="settingsModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div class="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl relative">
+            <button onclick="toggleModal('settingsModal', false)" class="absolute top-6 right-6 text-slate-400 hover:text-slate-600">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3 class="text-xl font-black text-slate-800 mb-6">Profile Settings</h3>
+            <div class="space-y-5">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Full Name</label>
+                    <input type="text" id="updateName" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-medium" placeholder="Full Name">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Update 4-Digit PIN</label>
+                    <input type="password" id="updatePin" maxlength="4" class="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-center text-xl tracking-widest font-black" placeholder="****">
+                </div>
+                <button id="saveSettingsBtn" class="w-full py-4 bg-blue-700 text-white rounded-2xl font-bold shadow-xl shadow-blue-100 hover:bg-blue-800 transition-all">
+                    Update Profile
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="setPinModal" class="hidden fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[70] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-sm w-full text-center">
+            <div class="w-16 h-16 bg-orange-100 text-orange-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-lock text-xl"></i>
+            </div>
+            <h2 class="text-xl font-bold mb-2">Create Security PIN</h2>
+            <p class="text-slate-500 text-sm mb-6">Choose a 4-digit PIN to secure your transfers.</p>
+            <input type="password" id="newPin" maxlength="4" placeholder="****" class="w-full p-4 bg-slate-100 rounded-2xl text-center text-3xl tracking-[1rem] outline-none border-2 border-transparent focus:border-blue-500 mb-6">
+            <button id="savePinBtn" class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">Save & Continue</button>
+        </div>
+    </div>
+
+    <div id="transferModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full">
+            <h2 class="text-2xl font-bold text-slate-800 mb-6">Send Money</h2>
+            <form id="transferForm" class="space-y-4">
+                <input type="number" id="tAmount" placeholder="Amount ($)" class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-bold" required>
+                <input type="number" id="tAccount" placeholder="Recipient Account Number" class="w-full p-4 bg-slate-50 border rounded-xl outline-none" required>
+                <div class="flex gap-3 mt-4">
+                    <button type="button" onclick="toggleTransfer(false)" class="flex-1 py-3 text-slate-500 font-bold">Cancel</button>
+                    <button type="submit" class="flex-1 py-3 bg-blue-700 text-white font-bold rounded-xl shadow-lg">Next</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="pinModal" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[60] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-sm w-full text-center shadow-2xl">
+            <h2 class="text-xl font-bold mb-2">Authorize Transfer</h2>
+            <p class="text-slate-500 text-sm mb-6">Enter your 4-digit transaction PIN to proceed.</p>
+            <input type="password" id="txnPin" maxlength="4" placeholder="****" class="w-full p-4 bg-slate-100 rounded-2xl text-center text-3xl tracking-[1rem] outline-none border-2 border-transparent focus:border-blue-500 mb-6">
+            <button id="confirmPinBtn" class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">Verify & Pay</button>
+            <button onclick="toggleModal('pinModal', false)" class="mt-4 text-slate-400 font-bold text-sm">Cancel</button>
+        </div>
+    </div>
+
+    <div id="loadingModal" class="hidden fixed inset-0 bg-white/90 backdrop-blur-lg z-[100] flex-col items-center justify-center">
+        <div class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+        <p id="loadingText" class="font-bold text-slate-800 animate-pulse">Processing Transaction...</p>
+    </div>
+
+    <div id="depositModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl text-center">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-wallet"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Deposit Funds</h2>
+            <p class="text-slate-500 text-sm mb-6">Transfer funds to the address below to credit your account.</p>
+            <div class="bg-slate-50 p-4 rounded-xl border border-dashed border-slate-300 mb-6">
+                <p class="text-[10px] text-slate-400 uppercase font-bold mb-1">Your Deposit Address</p>
+                <p class="text-xs font-mono break-all text-slate-800" id="depositAddr">SSE-0x71C7656EC7ab88b098defB751B7401B5f6d8976F</p>
+            </div>
+            <button onclick="copyAddr()" class="w-full py-3 bg-blue-50 text-blue-700 font-black rounded-xl hover:bg-blue-100 transition mb-2">Copy Address</button>
+            <button onclick="toggleDeposit(false)" class="w-full py-3 bg-slate-100 text-slate-600 font-bold rounded-xl hover:bg-slate-200 transition">Close</button>
+        </div>
+    </div>
+
+    <div id="txnDetailModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[80] items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-3xl overflow-hidden shadow-2xl">
+            <div class="p-6 text-center border-b border-slate-50">
+                <h3 class="text-lg font-black text-slate-800">Transaction Receipt</h3>
+            </div>
+            <div class="p-6 space-y-6">
+                <div class="flex flex-col items-center justify-center">
+                    <div id="detailIcon" class="w-12 h-12 rounded-full flex items-center justify-center mb-3"></div>
+                    <h2 id="detailAmount" class="text-3xl font-black text-slate-900">$0.00</h2>
+                    <p id="detailStatus" class="text-[10px] font-bold uppercase tracking-widest mt-1 text-green-600 bg-green-50 px-2 py-1 rounded">Successful</p>
+                </div>
+                
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400 font-bold">Description</span>
+                        <span id="detailDesc" class="font-bold text-slate-700">---</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400 font-bold">Date</span>
+                        <span id="detailDate" class="font-bold text-slate-700">---</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-400 font-bold">Ref ID</span>
+                        <span id="detailId" class="font-mono text-[10px] text-slate-500 uppercase">---</span>
+                    </div>
+                </div>
+                
+                <button onclick="toggleModal('txnDetailModal', false)" class="w-full py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-slate-800 transition-all">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script>
+        // Search Filter for Transactions
+        document.getElementById('txnSearch').addEventListener('input', (e) => {
+            const term = e.target.value.toLowerCase();
+            const items = document.querySelectorAll('.transaction-item');
+            items.forEach(item => {
+                item.style.display = item.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+            });
+        });
+
+        window.toggleLoan = (show) => {
+            const modal = document.getElementById('loanModal');
+            if(show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        };
+
+        function copyAcc() {
+            const numElement = document.getElementById('mainAccNo');
+            if (numElement && numElement.innerText !== "Generating...") {
+                const num = numElement.innerText;
+                navigator.clipboard.writeText(num).then(() => {
+                    if(window.showToast) window.showToast("Account Number Copied!", "success");
+                    else alert("Copied: " + num);
+                });
+            }
+        }
+
+        function copyAddr() {
+            const addr = document.getElementById('depositAddr').innerText;
+            navigator.clipboard.writeText(addr).then(() => {
+                if(window.showToast) window.showToast("Deposit Address Copied!", "success");
+                else alert("Address Copied!");
+            });
+        }
+    </script>
+</body>
+</html>

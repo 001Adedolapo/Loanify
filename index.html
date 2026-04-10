@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSE Bank | Modern Banking for Freelancers</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-sans leading-normal tracking-normal">
+
+    <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl font-black text-blue-600 tracking-tighter">SSEBANK</div>
+            
+            <div class="hidden md:flex space-x-8 text-sm font-bold text-slate-600">
+                <a href="#features" class="hover:text-blue-600 transition">Personal</a>
+                <a href="#business" class="hover:text-blue-600 transition">Business</a>
+                <a href="#faq" class="hover:text-blue-600 transition">Company</a>
+            </div>
+
+            <div class="hidden md:flex items-center space-x-4">
+                <button onclick="location.href='login.html'" class="text-sm font-bold text-slate-700 hover:text-blue-600">Login</button>
+                <button onclick="location.href='login.html'" class="bg-blue-600 text-white px-6 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition">Get Started</button>
+            </div>
+
+            <button class="md:hidden text-slate-600" id="mobileMenuBtn">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </div>
+        
+        <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-6 py-4 space-y-4">
+            <a href="#features" class="block text-slate-600 font-bold hover:text-blue-600 transition">Personal</a>
+            <a href="#business" class="block text-slate-600 font-bold hover:text-blue-600 transition">Business</a>
+            <a href="#faq" class="block text-slate-600 font-bold hover:text-blue-600 transition">Company</a>
+            <hr class="border-slate-100">
+            <div class="space-y-3">
+                <button onclick="location.href='login.html'" class="w-full text-slate-700 font-bold py-2 text-sm text-left">Login</button>
+                <button onclick="location.href='login.html'" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold shadow-lg shadow-blue-100">Get Started</button>
+            </div>
+        </div>
+    </nav>
+
+    <header class="pt-32 pb-16 px-6">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div class="animate-fade-in">
+                <span class="bg-blue-50 text-blue-600 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">The Future of Freelancing</span>
+                <h1 class="text-5xl md:text-7xl font-black text-slate-900 mt-6 mb-8 leading-[1.1]">
+                    Powerful Payment <span class="text-blue-600 text-outline">Solutions</span> for Freelancers.
+                </h1>
+                <p class="text-slate-500 text-lg mb-10 max-w-lg">
+                    Invoicing, bill pay, and cash flow control for small businesses and digital entrepreneurs. No more hoops, just pure growth.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button onclick="location.href='login.html'" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-transform shadow-xl">Open Free Account</button>
+                    <button onclick="handlePricing()" class="bg-white border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition">View Pricing</button>
+                </div>
+            </div>
+            
+            <div class="relative">
+                <div class="bg-blue-600/10 absolute -inset-4 rounded-[3rem] blur-2xl"></div>
+                <div class="relative bg-white border border-slate-100 rounded-[2rem] shadow-2xl overflow-hidden aspect-video flex items-center justify-center p-8">
+                    <img src="dashboard-preview.png" alt="Dashboard Preview" class="rounded-xl shadow-lg border border-slate-50">
+                    <div class="absolute inset-0 flex items-center justify-center bg-slate-50/50 backdrop-blur-[2px]">
+                         <p class="text-blue-600 font-black tracking-widest opacity-40">DASHBOARD PREVIEW</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-white py-16 border-y border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="text-center">
+                <p class="text-3xl font-black text-slate-900">₦2B+</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Processed</p>
+            </div>
+            <div class="text-center">
+                <p class="text-3xl font-black text-slate-900">50k+</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Users</p>
+            </div>
+            <div class="text-center">
+                <p class="text-3xl font-black text-slate-900">99.9%</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Uptime</p>
+            </div>
+            <div class="text-center">
+                <p class="text-3xl font-black text-slate-900">24/7</p>
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Support</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="py-24 px-6 bg-slate-50">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-16">
+                <h2 class="text-4xl font-black text-slate-900 mb-4">Banking built for your <br><span class="text-blue-600">Workflow.</span></h2>
+                <p class="text-slate-500">Fast, secure, and designed for modern entrepreneurs.</p>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <i class="fas fa-paper-plane text-blue-600 text-3xl mb-6"></i>
+                    <h3 class="text-xl font-bold mb-4">Lightning Transfers</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Send funds to any bank instantly. Our optimized routing ensures your money arrives before you close the tab.</p>
+                </div>
+                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <i class="fas fa-lock text-blue-600 text-3xl mb-6"></i>
+                    <h3 class="text-xl font-bold mb-4">Secure Escrow</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Protect your payments with our built-in escrow service. Only release funds when you are 100% satisfied.</p>
+                </div>
+                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <i class="fas fa-credit-card text-blue-600 text-3xl mb-6"></i>
+                    <h3 class="text-xl font-bold mb-4">Virtual Cards</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">Create unlimited virtual cards for online subscriptions and ads. Keep your main account details private.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="business" class="py-24 px-6 bg-white overflow-hidden">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
+            <div class="relative">
+                <div class="absolute -top-20 -left-20 w-80 h-80 bg-blue-100 rounded-full blur-[100px] opacity-60"></div>
+                <div class="relative z-10 bg-slate-900 p-8 rounded-[3rem] shadow-2xl text-white transform -rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <div class="flex justify-between items-start mb-20">
+                        <div class="text-xl font-black italic">SSE <span class="text-blue-500">PLATINUM</span></div>
+                        <i class="fas fa-wifi rotate-90 text-slate-600"></i>
+                    </div>
+                    <div class="text-2xl tracking-[0.3em] font-mono mb-10">4137 8829 0112 4492</div>
+                    <div class="flex justify-between items-end">
+                        <div>
+                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Card Holder</p>
+                            <p class="text-lg font-bold">JOHN DOE</p>
+                        </div>
+                        <div class="flex -space-x-3">
+                            <div class="w-10 h-10 rounded-full bg-red-500/90"></div>
+                            <div class="w-10 h-10 rounded-full bg-yellow-500/90"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <h2 class="text-4xl font-black text-slate-900 mb-8">Manage your business <br>without the <span class="text-blue-600">headaches.</span></h2>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
+                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <p class="font-bold text-slate-700 leading-tight">Detailed spending analytics and weekly financial reports.</p>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
+                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <p class="font-bold text-slate-700 leading-tight">Automated invoicing for your global clients.</p>
+                    </div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
+                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
+                            <i class="fas fa-headset"></i>
+                        </div>
+                        <p class="font-bold text-slate-700 leading-tight">Priority 24/7 support for business account holders.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="faq" class="py-24 px-6 bg-slate-50">
+        <div class="max-w-3xl mx-auto">
+            <h2 class="text-3xl font-black text-center text-slate-900 mb-12">Common Questions</h2>
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                    <p class="font-bold text-slate-900 mb-2">Is my money safe with SSE Bank?</p>
+                    <p class="text-slate-500 text-sm">Absolutely. We use 256-bit AES encryption and are fully compliant with national banking security standards.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                    <p class="font-bold text-slate-900 mb-2">How long do loan approvals take?</p>
+                    <p class="text-slate-500 text-sm">Approvals are instant based on your transaction history. Once approved, disbursement happens in under 60 seconds.</p>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100">
+                    <p class="font-bold text-slate-900 mb-2">Can I use SSE Bank for international payments?</p>
+                    <p class="text-slate-500 text-sm">Yes! You can receive payments in major currencies and withdraw directly to your local balance.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-slate-900 text-slate-400 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+            <div class="text-white font-black text-xl">SSEBANK</div>
+            <div class="flex space-x-6 text-sm font-bold">
+                <a href="#" class="hover:text-white">Privacy</a>
+                <a href="#" class="hover:text-white">Terms</a>
+                <a href="#" class="hover:text-white">Contact</a>
+            </div>
+            <p class="text-xs">© 2026 SSE Bank. Built with Precision.</p>
+        </div>
+    </footer>
+
+   <script>
+    // 1. Mobile Menu Toggle
+    const btn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    
+    btn.onclick = () => {
+        menu.classList.toggle('hidden');
+    };
+
+    // 2. Close mobile menu when a link is clicked
+    document.querySelectorAll('#mobileMenu a').forEach(link => {
+        link.onclick = () => menu.classList.add('hidden');
+    });
+
+    // 3. Feature placeholders
+    function handlePricing() {
+        alert("We are currently updating our 2026 pricing tiers. Contact support for immediate inquiries.");
+    }
+
+    // 4. Console log to verify every button is wired
+    document.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', () => {
+            console.log(`Button clicked: ${button.innerText}`);
+        });
+    });
+</script>
+</body>
+</html>
