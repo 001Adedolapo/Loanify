@@ -5,36 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Secure Access | SSE Bank</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module" src="app.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 font-sans h-screen flex items-center justify-center p-6">
+<body class="bg-slate-50 font-sans min-h-screen flex items-center justify-center p-6">
+
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 pointer-events-none"></div>
 
     <div class="bg-white w-full max-w-4xl grid md:grid-cols-2 rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
         
         <div class="bg-blue-700 p-12 text-white flex flex-col justify-between hidden md:flex">
             <div>
                 <h2 class="text-3xl font-bold">SSE BANK</h2>
-                <p class="mt-4 text-blue-100 leading-relaxed">Join thousands of entrepreneurs managing their finances with the world's most secure digital bank.</p>
+                <p class="mt-4 text-blue-100 leading-relaxed">The world's most secure digital bank for entrepreneurs.</p>
             </div>
             <div class="space-y-4">
-                <div class="flex items-center space-x-3">
+                <div class="flex items-center space-x-3 text-sm">
                     <span class="bg-blue-500 p-2 rounded-lg">✓</span>
-                    <span class="text-sm">Instant Account Opening</span>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <span class="bg-blue-500 p-2 rounded-lg">✓</span>
-                    <span class="text-sm">Secure Data Encryption</span>
+                    <span>Instant Account Opening</span>
                 </div>
             </div>
         </div>
 
-        <div class="p-8 md:p-12">
-            <div class="mb-10">
+        <div class="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+            <div class="mb-8">
                 <h3 class="text-2xl font-bold text-slate-800" id="formTitle">Create Account</h3>
                 <p class="text-slate-500 text-sm mt-2" id="formSub">Start your journey with SSE Bank today.</p>
             </div>
 
-            <form id="authForm" class="space-y-5">
+            <form id="authForm" class="space-y-4">
                 <div id="nameContainer">
                     <label class="block text-sm font-semibold text-slate-700">Full Name</label>
                     <input type="text" id="fullName" placeholder="John Doe" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
@@ -45,23 +43,157 @@
                     <input type="email" id="email" required placeholder="name@company.com" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
                 </div>
 
+                <div id="regExtraFields">
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-700">Country</label>
+                        <select id="countrySelect" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                            <option value="">Loading countries...</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-slate-700">Currency & Symbol</label>
+                        <input type="text" id="currencyDisplay" readonly placeholder="Automatic" class="w-full mt-1 p-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500">
+                    </div>
+                </div>
+
                 <div>
                     <label class="block text-sm font-semibold text-slate-700">Password</label>
                     <input type="password" id="password" required placeholder="••••••••" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
                 </div>
 
-                <button type="submit" class="w-full bg-blue-700 text-white p-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg mt-4">
+                <button type="submit" id="submitBtn" class="w-full bg-blue-700 text-white p-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg mt-4">
                     Continue
                 </button>
             </form>
 
             <div class="mt-8 text-center text-sm">
                 <span class="text-slate-500" id="toggleText">Already have an account?</span>
-                <button onclick="toggleAuth()" class="text-blue-700 font-bold ml-1 hover:underline" id="toggleBtn">Login here</button>
+                <button type="button" onclick="toggleAuth()" class="text-blue-700 font-bold ml-1 hover:underline" id="toggleBtn">Login here</button>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script type="module">
+        // 1. Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDBFe-wSC7xuzcTjrr6sEDJo7q5dwNiq4s",
+            authDomain: "loanify-208f8.firebaseapp.com",
+            projectId: "loanify-208f8",
+            storageBucket: "loanify-208f8.firebasestorage.app",
+            messagingSenderId: "344946599669",
+            appId: "1:344946599669:web:90c32f725866e1fb2d07bc"
+        };
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, serverTimestamp, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- Country & Currency Loader ---
+        async function loadCountries() {
+            const select = document.getElementById('countrySelect');
+            const currencyInput = document.getElementById('currencyDisplay');
+            
+            try {
+                const response = await fetch('https://restcountries.com/v3.1/all?fields=name,currencies');
+                const data = await response.json();
+                
+                select.innerHTML = '<option value="">Select Country</option>';
+                const sorted = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
+                
+                sorted.forEach(country => {
+                    const code = Object.keys(country.currencies || {})[0];
+                    const symbol = code ? country.currencies[code].symbol : '';
+                    if (!code) return;
+
+                    const opt = document.createElement('option');
+                    opt.value = country.name.common;
+                    opt.textContent = country.name.common;
+                    // We store the clean symbol and code in the dataset
+                    opt.dataset.code = code;
+                    opt.dataset.symbol = symbol;
+                    opt.dataset.currency = `${code} (${symbol})`;
+                    select.appendChild(opt);
+                });
+
+                select.onchange = () => {
+                    const selected = select.options[select.selectedIndex];
+                    currencyInput.value = selected.dataset.currency || "";
+                };
+            } catch (err) {
+                select.innerHTML = '<option value="">Error loading list</option>';
+            }
+        }
+        loadCountries();
+
+        // --- Toggle Logic ---
+        let isLogin = false;
+        window.toggleAuth = function() {
+            isLogin = !isLogin;
+            document.getElementById('formTitle').innerText = isLogin ? "Welcome Back" : "Create Account";
+            document.getElementById('nameContainer').style.display = isLogin ? "none" : "block";
+            document.getElementById('regExtraFields').style.display = isLogin ? "none" : "block";
+            document.getElementById('toggleBtn').innerText = isLogin ? "Register here" : "Login here";
+            document.getElementById('submitBtn').innerText = isLogin ? "Login" : "Continue";
+        };
+
+        // --- Auth Logic (Updated for Dynamic Currency) ---
+        document.getElementById('authForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullName = document.getElementById('fullName').value;
+            
+            const countrySelect = document.getElementById('countrySelect');
+            const selectedOpt = countrySelect.options[countrySelect.selectedIndex];
+
+            try {
+                if (isLogin) {
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    // Fetch user settings from Firestore to sync localStorage on login
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        localStorage.setItem('userCurrencySymbol', userData.currencySymbol || "$");
+                        localStorage.setItem('userCurrencyCode', userData.currencyCode || "USD");
+                    }
+                } else {
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    
+                    // Extract clean values from the selection
+                    const code = selectedOpt.dataset.code || "USD";
+                    const symbol = selectedOpt.dataset.symbol || "$";
+
+                    // Save to localStorage so the dashboard updates IMMEDIATELY
+                    localStorage.setItem('userCurrencySymbol', symbol);
+                    localStorage.setItem('userCurrencyCode', code);
+
+                    // Save to Firestore for permanent record
+                    await setDoc(doc(db, "users", user.uid), {
+                        name: fullName,
+                        email: email,
+                        balance: 0,
+                        currencyCode: code,
+                        currencySymbol: symbol,
+                        country: selectedOpt.value,
+                        accountNumber: Math.floor(1000000000 + Math.random() * 9000000000),
+                        createdAt: serverTimestamp(),
+                        isVerified: false
+                    });
+                }
+                // Redirect to dashboard
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                alert(error.message);
+            }
+        });
+    </script>
 </body>
 </html>

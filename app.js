@@ -19,6 +19,16 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// --- Dynamic Currency Mapping ---
+const countryData = {
+    "Nigeria": { symbol: "₦", code: "NGN" },
+    "Angola": { symbol: "Kz", code: "AOA" },
+    "United States": { symbol: "$", code: "USD" },
+    "United Kingdom": { symbol: "£", code: "GBP" },
+    "Ghana": { symbol: "GH₵", code: "GHS" },
+    "South Africa": { symbol: "R", code: "ZAR" }
+};
+
 // --- Toast Notification Logic ---
 window.showToast = function(message, type = 'success') {
     const container = document.getElementById('toastContainer');
@@ -38,7 +48,7 @@ window.showToast = function(message, type = 'success') {
 
 // --- Analytics Chart Logic ---
 let sseChart;
-function updateAnalytics(transactions) {
+function updateAnalytics(transactions, currencySymbol) {
     const ctx = document.getElementById('analyticsChart')?.getContext('2d');
     if (!ctx) return;
     const last7Days = [...Array(7)].map((_, i) => {
@@ -77,6 +87,7 @@ window.toggleAuth = function() {
     const title = document.getElementById('formTitle');
     const sub = document.getElementById('formSub');
     const nameField = document.getElementById('nameContainer');
+    const countryField = document.getElementById('countryContainer'); 
     const toggleText = document.getElementById('toggleText');
     const toggleBtn = document.getElementById('toggleBtn');
 
@@ -84,6 +95,7 @@ window.toggleAuth = function() {
         title.innerText = isLogin ? "Welcome Back" : "Create Account";
         sub.innerText = isLogin ? "Log in to access your secure vault." : "Start your journey with SSE Bank today.";
         nameField.style.display = isLogin ? "none" : "block";
+        if(countryField) countryField.style.display = isLogin ? "none" : "block";
         toggleText.innerText = isLogin ? "New to SSE Bank?" : "Already have an account?";
         toggleBtn.innerText = isLogin ? "Register here" : "Login here";
     }
@@ -97,15 +109,20 @@ if (authForm) {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         const fullName = document.getElementById('fullName') ? document.getElementById('fullName').value : "";
+        const country = document.getElementById('countrySelect') ? document.getElementById('countrySelect').value : null;
 
         try {
             if (isLogin) {
                 await signInWithEmailAndPassword(auth, email, password);
                 window.location.href = "dashboard.html";
             } else {
+                if (!country) return alert("Please select a country to proceed.");
+                
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000);
+
+                const selectedCurrency = countryData[country];
 
                 await setDoc(doc(db, "users", user.uid), {
                     name: fullName,
@@ -115,6 +132,9 @@ if (authForm) {
                     accountStatus: "Active",
                     accountTier: 1,
                     isVerified: false,
+                    country: country,
+                    currencySymbol: selectedCurrency.symbol,
+                    currencyCode: selectedCurrency.code,
                     createdAt: serverTimestamp()
                 });
 
@@ -133,30 +153,48 @@ onAuthStateChanged(auth, async (user) => {
     if (user) {
         const userRef = doc(db, "users", user.uid);
 
-        // Real-time listener for user data
         onSnapshot(userRef, async (docSnap) => {
             if (docSnap.exists()) {
                 const userData = docSnap.data();
                 const currentBalance = userData.balance || 0;
+                
+                const symbol = userData.currencySymbol; 
+                const isoCode = userData.currencyCode;
 
-                // Verification Check
                 if (userData.isVerified === false) {
                     toggleModal('otpModal', true);
                 } else {
                     toggleModal('otpModal', false);
                 }
 
-                // UI Updates
                 if (document.getElementById('userNameDisplay')) document.getElementById('userNameDisplay').innerText = `Welcome, ${userData.name}`;
-                if (document.getElementById('balanceDisplay')) document.getElementById('balanceDisplay').innerText = Number(currentBalance).toLocaleString('en-US', { minimumFractionDigits: 2 });
-                if (document.getElementById('statusDisplay')) document.getElementById('statusDisplay').innerText = userData.accountStatus;
+                
+                if (document.getElementById('balanceDisplay')) {
+                    document.getElementById('balanceDisplay').innerText = `${symbol}${Number(currentBalance).toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                }
+                if (document.getElementById('currencyCodeDisplay')) {
+                    document.getElementById('currencyCodeDisplay').innerText = isoCode;
+                }
+                
+                const currencyNodes = document.querySelectorAll('.currency-symbol');
+                currencyNodes.forEach(node => node.innerText = symbol);
+
+                // FIXED: Ensure status always displays 'Active' if defined in DB, else default to Active
+                if (document.getElementById('statusDisplay')) {
+                    document.getElementById('statusDisplay').innerText = userData.accountStatus || "Active";
+                }
                 
                 const tierBadge = document.getElementById('tierBadge');
                 if (tierBadge) {
                     const isTier2 = userData.accountTier === 2;
                     tierBadge.innerText = isTier2 ? "TIER 2 VERIFIED" : "LEVEL 1";
                     tierBadge.className = isTier2 ? "text-emerald-600 font-black" : "text-blue-600 font-black cursor-pointer hover:underline";
-                    if (!isTier2) tierBadge.onclick = () => toggleModal('kycModal', true);
+                    
+                    if (!isTier2) {
+                        tierBadge.onclick = () => toggleModal('kycModal', true);
+                    } else {
+                        tierBadge.onclick = null; 
+                    }
                 }
 
                 const accNo = userData.accountNumber || "Generating...";
@@ -168,7 +206,6 @@ onAuthStateChanged(auth, async (user) => {
                     document.getElementById('pinStatus').className = userData.pin ? "text-green-600 font-bold" : "text-orange-500 font-bold italic";
                 }
 
-                // Trigger Pin Modal if missing
                 if (!userData.pin) {
                     toggleModal('setPinModal', true);
                     const savePinBtn = document.getElementById('savePinBtn');
@@ -187,8 +224,7 @@ onAuthStateChanged(auth, async (user) => {
                     }
                 }
 
-                // Always fetch transaction history when data changes
-                renderTransactionHistory(user.uid);
+                renderTransactionHistory(user.uid, symbol);
             }
         });
     } else {
@@ -269,7 +305,7 @@ document.addEventListener('click', (e) => {
     if (e.target && e.target.id === 'depositBtn') toggleModal('depositModal', true);
 });
 
-// 8. Transfer Logic
+// 8. Transfer Logic (UPDATED with Tier 2 Upgrade Check)
 const transferForm = document.getElementById('transferForm');
 if (transferForm) {
     transferForm.addEventListener('submit', async (e) => {
@@ -282,6 +318,15 @@ if (transferForm) {
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
             const userData = userSnap.data();
+            const symbol = userData.currencySymbol; 
+
+            // TIER UPGRADE CHECK: Limit transfer if on Tier 1
+            if (amount >= 30000 && userData.accountTier < 2) {
+                toggleModal('transferModal', false);
+                alert(`⚠️ Limit Reached: To transfer ${symbol}${amount.toLocaleString()} or more, please upgrade to Tier 2.`);
+                toggleModal('kycModal', true);
+                return;
+            }
 
             if (!userData.pin) {
                 toggleModal('transferModal', false);
@@ -340,7 +385,8 @@ if (transferForm) {
                         ref: refId,
                         date: serverTimestamp(),
                         description: `Transfer to ${recipientData.name}`,
-                        recipientName: recipientData.name
+                        recipientName: recipientData.name,
+                        currencySymbol: symbol
                     });
 
                     await addDoc(collection(db, "transactions"), {
@@ -350,7 +396,8 @@ if (transferForm) {
                         ref: refId,
                         date: serverTimestamp(),
                         description: `Transfer from ${userData.name}`,
-                        senderName: userData.name
+                        senderName: userData.name,
+                        currencySymbol: symbol
                     });
 
                     toggleModal('loadingModal', false);
@@ -377,6 +424,9 @@ if (depositForm) {
             try {
                 showToast("Processing Deposit...", "success");
                 const userRef = doc(db, "users", user.uid);
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data();
+                const symbol = userData.currencySymbol; 
                 const refId = "DEP-" + Math.floor(100000 + Math.random() * 900000) + "-SSE";
 
                 await updateDoc(userRef, { balance: increment(amount) });
@@ -387,10 +437,11 @@ if (depositForm) {
                     type: "Credit",
                     ref: refId,
                     description: "Wallet Deposit",
-                    date: serverTimestamp()
+                    date: serverTimestamp(),
+                    currencySymbol: symbol
                 });
 
-                showToast(`Success! $${amount.toLocaleString()} deposited.`);
+                showToast(`Success! ${symbol}${amount.toLocaleString()} deposited.`);
                 toggleModal('depositModal', false);
                 setTimeout(() => location.reload(), 2000);
             } catch (err) {
@@ -437,7 +488,7 @@ if (saveSettingsBtn) {
 }
 
 // 10. Render History
-async function renderTransactionHistory(uid) {
+async function renderTransactionHistory(uid, symbol) {
     const container = document.getElementById('transactionList');
     if (!container) return;
 
@@ -472,11 +523,11 @@ async function renderTransactionHistory(uid) {
                         <p class="text-[10px] text-slate-400 uppercase">${timeStr}</p>
                     </div>
                 </div>
-                <p class="font-black ${isCredit ? 'text-green-600' : 'text-red-600'}">${isCredit ? '+' : '-'}$${t.amount.toLocaleString()}</p>
+                <p class="font-black ${isCredit ? 'text-green-600' : 'text-red-600'}">${isCredit ? '+' : '-'}${symbol}${t.amount.toLocaleString()}</p>
             `;
             
             txnItem.onclick = () => {
-                document.getElementById('detailAmount').innerText = `${isCredit ? '+' : '-'}$${t.amount.toLocaleString()}`;
+                document.getElementById('detailAmount').innerText = `${isCredit ? '+' : '-'}${symbol}${t.amount.toLocaleString()}`;
                 document.getElementById('detailDesc').innerText = t.description;
                 document.getElementById('detailDate').innerText = dateObj.toLocaleString();
                 document.getElementById('detailId').innerText = t.ref || "N/A"; 
@@ -485,32 +536,26 @@ async function renderTransactionHistory(uid) {
             container.appendChild(txnItem);
         });
 
-        updateAnalytics(transactions);
+        updateAnalytics(transactions, symbol);
     } catch (err) {
         console.error(err);
     }
 }
 
-// 11. Loan Request Logic (Fixed & Hardened)
+// 11. Loan Request Logic 
 const initLoanForm = () => {
     const loanForm = document.getElementById('loanForm');
     if (!loanForm) return;
 
-    // Use onsubmit directly to avoid duplicate listeners if onAuthStateChanged fires multiple times
     loanForm.onsubmit = async (e) => {
         e.preventDefault();
-        console.log("Submit triggered"); // Debugging
-
         const user = auth.currentUser;
         if (!user) return alert("Please login to apply");
 
         const amountInput = document.getElementById('lAmount');
         const durationInput = document.getElementById('lDuration');
         
-        if (!amountInput || !durationInput) {
-            console.error("Input fields missing!");
-            return;
-        }
+        if (!amountInput || !durationInput) return;
 
         const amount = parseFloat(amountInput.value);
         const duration = durationInput.value;
@@ -526,11 +571,10 @@ const initLoanForm = () => {
             const userRef = doc(db, "users", user.uid);
             const userSnap = await getDoc(userRef);
             const userData = userSnap.data();
+            const symbol = userData.currencySymbol; 
 
-            // 1. Update Balance
             await updateDoc(userRef, { balance: increment(amount) });
 
-            // 2. Record Loan in Database
             await addDoc(collection(db, "loans"), {
                 userId: user.uid,
                 userName: userData.name,
@@ -540,29 +584,87 @@ const initLoanForm = () => {
                 requestDate: serverTimestamp()
             });
 
-            // 3. Create Transaction Entry
             await addDoc(collection(db, "transactions"), {
                 userId: user.uid,
                 amount: amount,
                 type: "Credit", 
                 description: `Loan Disbursement: ${duration}`,
                 ref: "LOAN-" + Math.floor(100000 + Math.random() * 900000),
-                date: serverTimestamp()
+                date: serverTimestamp(),
+                currencySymbol: symbol
             });
 
-            showToast(`Success! $${amount.toLocaleString()} credited.`);
+            showToast(`Success! ${symbol}${amount.toLocaleString()} credited.`);
             toggleModal('loanModal', false);
-            
-            // Short delay so they see the success toast
             setTimeout(() => location.reload(), 1500);
 
         } catch (error) {
-            console.error("Loan Error:", error);
             showToast("Error processing loan disbursement", "error");
         }
     };
 };
 
-// Initialize loan logic
-initLoanForm();
+// --- 12. INVESTMENT LOGIC ---
+const initInvestmentForm = () => {
+    const investForm = document.getElementById('investForm');
+    if (!investForm) return;
 
+    investForm.onsubmit = async (e) => {
+        e.preventDefault();
+        const user = auth.currentUser;
+        if (!user) return alert("Please login to invest");
+
+        const amount = parseFloat(document.getElementById('iAmount').value);
+        const plan = document.getElementById('iPlan').value; 
+
+        if (isNaN(amount) || amount <= 0) {
+            showToast("Enter a valid investment amount", "error");
+            return;
+        }
+
+        try {
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            const userData = userSnap.data();
+            const symbol = userData.currencySymbol; 
+
+            if (userData.balance < amount) {
+                showToast("Insufficient balance for this investment", "error");
+                return;
+            }
+
+            showToast("Processing Investment...", "success");
+
+            await updateDoc(userRef, { balance: increment(-amount) });
+
+            await addDoc(collection(db, "investments"), {
+                userId: user.uid,
+                plan: plan,
+                amount: amount,
+                status: "Active",
+                timestamp: serverTimestamp()
+            });
+
+            await addDoc(collection(db, "transactions"), {
+                userId: user.uid,
+                amount: amount,
+                type: "Debit",
+                description: `Investment: ${plan} Plan`,
+                ref: "INV-" + Math.floor(100000 + Math.random() * 900000),
+                date: serverTimestamp(),
+                currencySymbol: symbol
+            });
+
+            showToast(`Investment Successful! ${symbol}${amount.toLocaleString()} committed.`);
+            toggleModal('investModal', false);
+            setTimeout(() => location.reload(), 2000);
+
+        } catch (error) {
+            console.error(error);
+            showToast("Investment failed", "error");
+        }
+    };
+};
+
+initLoanForm();
+initInvestmentForm();

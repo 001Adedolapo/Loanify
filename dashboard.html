@@ -51,6 +51,16 @@
         left: 0;
     }
     .card-back { transform: rotateY(180deg); }
+
+    /* New: Session Warning Pulse */
+    .session-warning {
+        animation: pulse-red 2s infinite;
+    }
+    @keyframes pulse-red {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
 </style>
 
 <body class="bg-slate-50 font-sans">
@@ -58,6 +68,10 @@
     <div id="verifyEmailBanner" class="hidden bg-amber-500 text-white text-center py-2 px-4 text-xs font-bold animate-pulse">
         <i class="fas fa-exclamation-triangle mr-2"></i> 
         Email not verified! Please check your inbox to secure your account.
+    </div>
+
+    <div id="sessionTimeoutBar" class="hidden bg-red-600 text-white text-center py-1 text-[10px] font-bold uppercase tracking-widest">
+        Inactivity Timeout: Your session will expire soon.
     </div>
 
     <div id="toastContainer" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] space-y-3 w-full max-w-xs pointer-events-none"></div>
@@ -78,7 +92,7 @@
             <div class="md:col-span-2 bg-gradient-to-br from-blue-700 to-indigo-900 rounded-3xl p-8 text-white shadow-xl relative overflow-hidden">
                 <div class="relative z-10">
                     <p class="text-blue-100 text-sm opacity-80 uppercase tracking-wider font-bold">Total Available Balance</p>
-                    <h1 class="text-5xl font-black mt-2">$<span id="balanceDisplay">0.00</span></h1>
+                    <h1 class="text-5xl font-black mt-2"><span class="currencySymbol"></span><span id="balanceDisplay">0.00</span></h1>
                     
                     <div class="mt-6 flex items-center gap-2 bg-white/10 w-fit px-3 py-2 rounded-lg border border-white/20">
                         <span class="text-xs font-mono text-blue-100">ACCT: <span id="mainAccNo" class="text-white font-bold tracking-widest">Generating...</span></span>
@@ -99,7 +113,7 @@
                 <div class="space-y-4 text-sm">
                     <div class="flex justify-between border-b pb-2">
                         <span class="text-slate-500 font-bold">Tier</span>
-                        <span id="tierBadge" class="text-blue-600 font-black cursor-pointer hover:underline">LEVEL 1</span>
+                        <span id="tierBadge" onclick="toggleModal('kycModal', true)" class="text-blue-600 font-black cursor-pointer hover:underline">LEVEL 1</span>
                     </div>
                     <div class="flex justify-between border-b pb-2">
                         <span class="text-slate-500 font-bold">Security</span>
@@ -171,6 +185,25 @@
         </div>
     </main>
 
+    <div id="kycModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center">
+            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fas fa-id-card"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Upgrade to Tier 2</h2>
+            <p class="text-slate-500 text-sm mb-6">Verify your identity to unlock higher limits and premium banking features.</p>
+            
+            <div onclick="document.getElementById('kycFile').click()" class="border-2 border-dashed border-slate-200 rounded-2xl p-8 mb-6 hover:border-blue-400 transition cursor-pointer group">
+                <input type="file" id="kycFile" class="hidden" accept="image/*,.pdf">
+                <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 group-hover:text-blue-400 mb-2"></i>
+                <p id="kycFileName" class="text-xs font-bold text-slate-400 group-hover:text-blue-500">Upload ID Card or Passport</p>
+            </div>
+
+            <button id="submitKyc" class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">Verify Identity</button>
+            <button onclick="toggleModal('kycModal', false)" class="mt-4 text-slate-400 text-sm font-bold">Maybe Later</button>
+        </div>
+    </div>
+
     <div id="loanModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
         <div class="bg-white rounded-3xl p-8 max-w-md w-full">
             <div class="w-16 h-16 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
@@ -180,7 +213,7 @@
             <p class="text-slate-500 text-sm text-center mb-6">Apply for an instant credit limit based on your account activity.</p>
             <form id="loanForm" class="space-y-4">
                 <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Desired Amount ($)</label>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Desired Amount (<span class="currencySymbol"></span>)</label>
                     <input type="number" id="loanAmount" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold focus:ring-2 focus:ring-amber-500/20" placeholder="0.00" required>
                 </div>
                 <div>
@@ -194,22 +227,6 @@
                 <button type="submit" class="w-full py-4 bg-amber-500 text-white font-bold rounded-2xl shadow-lg hover:bg-amber-600 transition">Submit Application</button>
                 <button type="button" onclick="toggleLoan(false)" class="w-full text-slate-400 text-sm font-bold">Cancel</button>
             </form>
-        </div>
-    </div>
-
-    <div id="kycModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
-        <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center">
-            <div class="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
-                <i class="fas fa-id-card"></i>
-            </div>
-            <h2 class="text-xl font-bold text-slate-800 mb-2">Upgrade to Tier 2</h2>
-            <p class="text-slate-500 text-sm mb-6">Verify your identity to unlock higher limits and premium banking features.</p>
-            <div class="border-2 border-dashed border-slate-200 rounded-2xl p-8 mb-6 hover:border-blue-400 transition cursor-pointer group">
-                <i class="fas fa-cloud-upload-alt text-3xl text-slate-300 group-hover:text-blue-400 mb-2"></i>
-                <p class="text-xs font-bold text-slate-400 group-hover:text-blue-500">Upload ID Card or Passport</p>
-            </div>
-            <button id="submitKyc" class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">Verify Identity</button>
-            <button onclick="toggleModal('kycModal', false)" class="mt-4 text-slate-400 text-sm font-bold">Maybe Later</button>
         </div>
     </div>
 
@@ -261,7 +278,7 @@
         <div class="bg-white rounded-3xl p-8 max-w-md w-full">
             <h2 class="text-2xl font-bold text-slate-800 mb-6">Send Money</h2>
             <form id="transferForm" class="space-y-4">
-                <input type="number" id="tAmount" placeholder="Amount ($)" class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-bold" required>
+                <input type="number" id="tAmount" placeholder="Amount" class="w-full p-4 bg-slate-50 border rounded-xl outline-none font-bold" required>
                 <input type="number" id="tAccount" placeholder="Recipient Account Number" class="w-full p-4 bg-slate-50 border rounded-xl outline-none" required>
                 <div class="flex gap-3 mt-4">
                     <button type="button" onclick="toggleTransfer(false)" class="flex-1 py-3 text-slate-500 font-bold">Cancel</button>
@@ -310,7 +327,7 @@
             <div class="p-6 space-y-6">
                 <div class="flex flex-col items-center justify-center">
                     <div id="detailIcon" class="w-12 h-12 rounded-full flex items-center justify-center mb-3"></div>
-                    <h2 id="detailAmount" class="text-3xl font-black text-slate-900">$0.00</h2>
+                    <h2 id="detailAmount" class="text-3xl font-black text-slate-900"><span class="currencySymbol"></span>0.00</h2>
                     <p id="detailStatus" class="text-[10px] font-bold uppercase tracking-widest mt-1 text-green-600 bg-green-50 px-2 py-1 rounded">Successful</p>
                 </div>
                 
@@ -336,17 +353,124 @@
         </div>
     </div>
 
+    <script type="text/javascript">
+var _smartsupp = _smartsupp || {};
+_smartsupp.key = 'beedc89473d6de5eade8bd41e0fe40384b6bd54d';
+window.smartsupp||(function(d) {
+  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+  c.type='text/javascript';c.charset='utf-8';c.async=true;
+  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+})(document);
+
+// --- ADD THIS PART BELOW ---
+// Replace the variables below with the actual data from your dashboard
+smartsupp('identify', {
+    id: 'USER_ACCOUNT_ID', // e.g., 1201619020
+    name: 'USER_NAME',     // e.g., John Doe
+});
+</script>
+
+
     <script type="module" src="app.js"></script>
     <script>
-        // Search Filter for Transactions
-        document.getElementById('txnSearch').addEventListener('input', (e) => {
-            const term = e.target.value.toLowerCase();
-            const items = document.querySelectorAll('.transaction-item');
-            items.forEach(item => {
-                item.style.display = item.innerText.toLowerCase().includes(term) ? 'flex' : 'none';
+        // --- UPDATED: Dynamic Currency Configuration (Naira Default) ---
+        const currencyMap = {
+            "Nigeria": { symbol: "₦", code: "NGN" },
+            "Angola": { symbol: "Kz", code: "AOA" },
+            "USA": { symbol: "$", code: "USD" },
+            "UK": { symbol: "£", code: "GBP" },
+            "Europe": { symbol: "€", code: "EUR" }
+        };
+
+        function updateDashboardCurrency() {
+            const userCountry = localStorage.getItem('userCountry') || "";
+            const currency = currencyMap[userCountry] || currencyMap[""];
+
+          // This checks if 'currency' exists; if it doesn't, the function stops here.
+if (!currency || !currency.symbol) return;
+
+// If we reach this line, 'currency' is guaranteed to be valid.
+document.querySelectorAll('.currencySymbol').forEach(el => {
+    el.innerText = currency.symbol;
+});
+
+            document.querySelectorAll('.currencyCode').forEach(el => {
+                el.innerText = currency.code;
             });
+            
+            const tAmount = document.getElementById('tAmount');
+            if(tAmount) tAmount.placeholder = `Amount (${currency.symbol})`;
+        }
+
+        // --- NEW: Input Sanitization & Validation ---
+        const validatePIN = (pin) => /^\d{4}$/.test(pin);
+        
+        document.getElementById('updatePin')?.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
         });
 
+        // --- NEW: Session Activity Tracker ---
+        let inactivityTimer;
+        const resetTimer = () => {
+            clearTimeout(inactivityTimer);
+            document.getElementById('sessionTimeoutBar').classList.add('hidden');
+            inactivityTimer = setTimeout(() => {
+                document.getElementById('sessionTimeoutBar').classList.remove('hidden');
+            }, 300000); 
+        };
+
+        window.onload = () => {
+            resetTimer();
+            updateDashboardCurrency();
+        };
+        document.onmousemove = resetTimer;
+        document.onkeypress = resetTimer;
+
+        // --- KYC TIER 2 UPGRADE LOGIC ---
+        const kycInput = document.getElementById('kycFile');
+        const kycFileName = document.getElementById('kycFileName');
+        const submitKycBtn = document.getElementById('submitKyc');
+
+        // Update display when file is chosen
+        kycInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                kycFileName.innerText = "Selected: " + this.files[0].name;
+                kycFileName.classList.replace('text-slate-400', 'text-blue-600');
+            }
+        });
+
+        submitKycBtn.addEventListener('click', () => {
+            if (!kycInput.files.length) {
+                alert("Please select a document first!");
+                return;
+            }
+
+            // Show loading state
+            toggleModal('kycModal', false);
+            const loadingModal = document.getElementById('loadingModal');
+            const loadingText = document.getElementById('loadingText');
+            
+            loadingModal.classList.remove('hidden');
+            loadingModal.classList.add('flex');
+            loadingText.innerText = "Verifying Documents...";
+
+            // Simulate verification delay
+            setTimeout(() => {
+                loadingModal.classList.add('hidden');
+                loadingModal.classList.remove('flex');
+                
+                // Alert user of success (In a real app, this would update a database)
+                alert("Verification Successful! Your Tier level will be updated shortly.");
+                
+                // Update Badge UI
+                const badge = document.getElementById('tierBadge');
+                badge.innerText = "LEVEL 2";
+                badge.classList.replace('text-blue-600', 'text-emerald-600');
+            }, 3000);
+        });
+
+        // --- UI Modal Helpers ---
         window.toggleLoan = (show) => {
             const modal = document.getElementById('loanModal');
             if(show) {
@@ -358,24 +482,42 @@
             }
         };
 
+        window.toggleModal = (id, show) => {
+            const modal = document.getElementById(id);
+            if(show) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            } else {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
         function copyAcc() {
             const numElement = document.getElementById('mainAccNo');
             if (numElement && numElement.innerText !== "Generating...") {
                 const num = numElement.innerText;
                 navigator.clipboard.writeText(num).then(() => {
-                    if(window.showToast) window.showToast("Account Number Copied!", "success");
-                    else alert("Copied: " + num);
+                    alert("Account Number Copied!");
                 });
             }
         }
 
-        function copyAddr() {
-            const addr = document.getElementById('depositAddr').innerText;
-            navigator.clipboard.writeText(addr).then(() => {
-                if(window.showToast) window.showToast("Deposit Address Copied!", "success");
-                else alert("Address Copied!");
-            });
-        }
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+    // 1. Clear the Smartsupp chat session
+    if (typeof smartsupp === 'function') {
+        smartsupp('clean');
+    }
+
+    // 2. Clear your app's local data (e.g., localStorage or cookies)
+    localStorage.clear(); 
+    sessionStorage.clear();
+
+    // 3. Redirect to your login page
+    window.location.href = 'index.html'; // Adjust this to your actual login filename
+});
+
+
     </script>
 </body>
 </html>
