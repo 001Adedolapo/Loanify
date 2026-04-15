@@ -3,17 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SSE Bank | Modern Banking for Freelancers</title>
+    <title>SSE Bank | Modern Banking for Global Business</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
     <style>
         html {
             scroll-behavior: smooth;
         }
+        .text-outline {
+            -webkit-text-stroke: 1px #2563eb;
+            color: transparent;
+        }
+        .dashboard-gradient {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+        /* New Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-reveal {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        /* Trust Logo Animation */
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .logo-marquee {
+            display: flex;
+            width: 200%;
+            animation: scroll 30s linear infinite;
+        }
     </style>
 </head>
-<body class="bg-slate-50 font-sans leading-normal tracking-normal">
+<body class="bg-slate-50 font-sans leading-normal tracking-normal text-slate-900">
 
     <nav class="fixed w-full z-50 bg-white/80 backdrop-blur-md border-b border-slate-100">
         <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
@@ -21,8 +45,9 @@
             
             <div class="hidden md:flex space-x-8 text-sm font-bold text-slate-600">
                 <a href="#features" class="hover:text-blue-600 transition">Personal</a>
+                <a href="#transfer" class="hover:text-blue-600 transition">Transfer</a>
                 <a href="#business" class="hover:text-blue-600 transition">Business</a>
-                <a href="#faq" class="hover:text-blue-600 transition">Company</a>
+                <a href="#contact" class="hover:text-blue-600 transition">Contact</a>
             </div>
 
             <div class="hidden md:flex items-center space-x-4">
@@ -37,8 +62,9 @@
         
         <div id="mobileMenu" class="hidden md:hidden bg-white border-b border-slate-100 px-6 py-4 space-y-4">
             <a href="#features" class="block text-slate-600 font-bold hover:text-blue-600 transition">Personal</a>
+            <a href="#transfer" class="block text-slate-600 font-bold hover:text-blue-600 transition">Transfer</a>
             <a href="#business" class="block text-slate-600 font-bold hover:text-blue-600 transition">Business</a>
-            <a href="#faq" class="block text-slate-600 font-bold hover:text-blue-600 transition">Company</a>
+            <a href="#contact" class="block text-slate-600 font-bold hover:text-blue-600 transition">Contact</a>
             <hr class="border-slate-100">
             <div class="space-y-3">
                 <button onclick="location.href='login.html'" class="w-full text-slate-700 font-bold py-2 text-sm text-left">Login</button>
@@ -49,184 +75,282 @@
 
     <header class="pt-32 pb-16 px-6">
         <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-            <div class="animate-fade-in">
-                <span class="bg-blue-50 text-blue-600 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">The Future of Freelancing</span>
+            <div class="animate-reveal">
+                <span class="bg-blue-50 text-blue-600 text-xs font-black px-4 py-1.5 rounded-full uppercase tracking-widest">Borderless Financial Hub</span>
                 <h1 class="text-5xl md:text-7xl font-black text-slate-900 mt-6 mb-8 leading-[1.1]">
-                    Powerful Payment <span class="text-blue-600 text-outline">Solutions</span> for Freelancers.
+                    Powerful Payment <span class="text-blue-600 text-outline">Solutions</span> for Modern Business.
                 </h1>
                 <p class="text-slate-500 text-lg mb-10 max-w-lg">
-                    Invoicing, bill pay, and cash flow control for small businesses and digital entrepreneurs. No more hoops, just pure growth.
+                    Comprehensive banking, instant global transfers, and cash flow control for digital entrepreneurs and high-growth teams. 
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4">
+                <div class="flex flex-col sm:flex-row gap-4 mb-8">
                     <button onclick="location.href='login.html'" class="bg-slate-900 text-white px-8 py-4 rounded-2xl font-bold text-lg hover:scale-105 transition-transform shadow-xl">Open Free Account</button>
-                    <button onclick="handlePricing()" class="bg-white border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition">View Pricing</button>
+                    <button onclick="handlePricing()" class="bg-white border border-slate-200 text-slate-700 px-8 py-4 rounded-2xl font-bold text-lg hover:bg-slate-50 transition">View Plans</button>
+                </div>
+                <div class="flex items-center gap-4 opacity-70 grayscale hover:grayscale-0 transition duration-500">
+                    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/3/3c/Download_on_the_App_Store_Badge.svg" class="h-10" alt="App Store"></a>
+                    <a href="#"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" class="h-10" alt="Play Store"></a>
                 </div>
             </div>
             
-            <div class="relative">
+            <div class="relative animate-reveal" style="animation-delay: 0.2s;">
                 <div class="bg-blue-600/10 absolute -inset-4 rounded-[3rem] blur-2xl"></div>
-                <div class="relative bg-white border border-slate-100 rounded-[2rem] shadow-2xl overflow-hidden aspect-video flex items-center justify-center p-8">
-                    <img src="dashboard-preview.png" alt="Dashboard Preview" class="rounded-xl shadow-lg border border-slate-50">
-                    <div class="absolute inset-0 flex items-center justify-center bg-slate-50/50 backdrop-blur-[2px]">
-                         <p class="text-blue-600 font-black tracking-widest opacity-40">DASHBOARD PREVIEW</p>
+                <div class="absolute -top-6 -right-6 bg-white p-4 rounded-2xl shadow-xl z-10 hidden lg:flex items-center gap-3 border border-slate-50">
+                    <div class="bg-green-100 text-green-600 w-10 h-10 rounded-full flex items-center justify-center">
+                        <i class="fas fa-check-shield text-xl"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase text-slate-400">Security Status</p>
+                        <p class="text-xs font-bold text-slate-800">FDIC Insured up to $250k</p>
+                    </div>
+                </div>
+
+                <div class="relative bg-white border border-slate-100 rounded-[2rem] shadow-2xl overflow-hidden aspect-[4/3] flex items-center justify-center dashboard-gradient">
+                    <img src="https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&q=80&w=1000" alt="Vintora Banking Dashboard" class="w-full h-full object-cover opacity-90">
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/40 to-transparent flex items-end p-8">
+                         <p class="text-white font-bold tracking-wide text-sm bg-blue-600/80 backdrop-blur-md px-4 py-2 rounded-lg">Vintora Secure Infrastructure</p>
                     </div>
                 </div>
             </div>
         </div>
     </header>
 
-    <section class="bg-white py-16 border-y border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-            <div class="text-center">
-                <p class="text-3xl font-black text-slate-900">₦2B+</p>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Processed</p>
+    <section class="py-12 bg-white overflow-hidden border-y border-slate-50">
+        <p class="text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8">Trusted by 50,000+ businesses worldwide</p>
+        <div class="logo-marquee flex gap-12 items-center opacity-40 grayscale">
+            <span class="text-2xl font-bold px-8">Stripe</span>
+            <span class="text-2xl font-bold px-8">Shopify</span>
+            <span class="text-2xl font-bold px-8">Webflow</span>
+            <span class="text-2xl font-bold px-8">Coinbase</span>
+            <span class="text-2xl font-bold px-8">Flutterwave</span>
+            <span class="text-2xl font-bold px-8">Paystack</span>
+            <span class="text-2xl font-bold px-8">Stripe</span>
+            <span class="text-2xl font-bold px-8">Shopify</span>
+            <span class="text-2xl font-bold px-8">Webflow</span>
+            <span class="text-2xl font-bold px-8">Coinbase</span>
+            <span class="text-2xl font-bold px-8">Flutterwave</span>
+            <span class="text-2xl font-bold px-8">Paystack</span>
+        </div>
+    </section>
+
+    <section id="features" class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto text-center mb-16">
+            <h2 class="text-4xl font-black text-slate-900 mb-4">Why Businesses Choose SSE Bank</h2>
+            <p class="text-slate-500 max-w-2xl mx-auto">We combine traditional banking security with next-generation technology to give you total control over your funds.</p>
+        </div>
+        <div class="max-w-7xl mx-auto grid md:grid-cols-4 gap-8">
+            <div class="p-8 text-center group hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition duration-300">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i class="fas fa-shield-alt text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">Military Security</h3>
+                <p class="text-slate-500 text-sm">256-bit AES encryption and multi-factor hardware keys.</p>
             </div>
-            <div class="text-center">
-                <p class="text-3xl font-black text-slate-900">50k+</p>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Users</p>
+            <div class="p-8 text-center group hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition duration-300">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i class="fas fa-bolt text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">Instant Settlement</h3>
+                <p class="text-slate-500 text-sm">Move money across borders in seconds, not days.</p>
             </div>
-            <div class="text-center">
-                <p class="text-3xl font-black text-slate-900">99.9%</p>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Uptime</p>
+            <div class="p-8 text-center group hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition duration-300">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i class="fas fa-credit-card text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">Virtual Cards</h3>
+                <p class="text-slate-500 text-sm">Create unlimited virtual cards for team expenses.</p>
             </div>
-            <div class="text-center">
-                <p class="text-3xl font-black text-slate-900">24/7</p>
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Support</p>
+            <div class="p-8 text-center group hover:bg-slate-50 rounded-3xl border border-transparent hover:border-slate-100 transition duration-300">
+                <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-600 group-hover:text-white transition">
+                    <i class="fas fa-chart-line text-2xl"></i>
+                </div>
+                <h3 class="font-bold text-lg mb-2">Smart Insights</h3>
+                <p class="text-slate-500 text-sm">AI-driven analytics to track your business growth.</p>
             </div>
         </div>
     </section>
 
-    <section id="features" class="py-24 px-6 bg-slate-50">
-        <div class="max-w-7xl mx-auto">
-            <div class="mb-16">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Banking built for your <br><span class="text-blue-600">Workflow.</span></h2>
-                <p class="text-slate-500">Fast, secure, and designed for modern entrepreneurs.</p>
+    <section id="transfer" class="bg-slate-900 py-20 px-6 text-white overflow-hidden relative">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-4xl font-black mb-6">Global Money Transfer</h2>
+                <div class="w-16 h-1 bg-blue-600 mb-8"></div>
+                <ul class="space-y-6 text-lg">
+                    <li class="flex items-center gap-4 hover:text-blue-400 cursor-pointer transition">
+                        <i class="fas fa-university text-blue-600"></i> IBank Transfer
+                    </li>
+                    <li class="flex items-center gap-4 hover:text-blue-400 cursor-pointer transition">
+                        <i class="fas fa-flag-usa text-blue-600"></i> USA Money Transfer
+                    </li>
+                    <li class="flex items-center gap-4 hover:text-blue-400 cursor-pointer transition">
+                        <i class="fas fa-gbp text-blue-600"></i> UK Money Transfer
+                    </li>
+                    <li class="flex items-center gap-4 hover:text-blue-400 cursor-pointer transition">
+                        <i class="fas fa-euro-sign text-blue-600"></i> Euro Money Transfer
+                    </li>
+                </ul>
+                <button onclick="location.href='login.html'" class="mt-12 bg-blue-600 px-8 py-3 rounded-xl font-bold hover:bg-blue-700">Start Transfer</button>
             </div>
-            <div class="grid md:grid-cols-3 gap-8">
-                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <i class="fas fa-paper-plane text-blue-600 text-3xl mb-6"></i>
-                    <h3 class="text-xl font-bold mb-4">Lightning Transfers</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">Send funds to any bank instantly. Our optimized routing ensures your money arrives before you close the tab.</p>
-                </div>
-                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <i class="fas fa-lock text-blue-600 text-3xl mb-6"></i>
-                    <h3 class="text-xl font-bold mb-4">Secure Escrow</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">Protect your payments with our built-in escrow service. Only release funds when you are 100% satisfied.</p>
-                </div>
-                <div class="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <i class="fas fa-credit-card text-blue-600 text-3xl mb-6"></i>
-                    <h3 class="text-xl font-bold mb-4">Virtual Cards</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">Create unlimited virtual cards for online subscriptions and ads. Keep your main account details private.</p>
+            <div class="hidden md:block">
+                <div class="bg-white/5 p-10 rounded-[3rem] border border-white/10 backdrop-blur-sm">
+                    <div class="text-center mb-6">
+                        <i class="fas fa-globe-americas text-6xl text-blue-500 mb-4"></i>
+                        <p class="text-slate-400 uppercase tracking-widest text-xs font-bold">Real-time Exchange Rates</p>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span>USD/EUR</span><span class="text-green-400">0.92 ↑</span></div>
+                        <div class="flex justify-between border-b border-white/10 pb-2"><span>GBP/USD</span><span class="text-green-400">1.27 ↑</span></div>
+                        <div class="flex justify-between pb-2"><span>USD/NGN</span><span class="text-slate-300">Market Rate</span></div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="business" class="py-24 px-6 bg-white overflow-hidden">
-        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-20 items-center">
-            <div class="relative">
-                <div class="absolute -top-20 -left-20 w-80 h-80 bg-blue-100 rounded-full blur-[100px] opacity-60"></div>
-                <div class="relative z-10 bg-slate-900 p-8 rounded-[3rem] shadow-2xl text-white transform -rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <div class="flex justify-between items-start mb-20">
-                        <div class="text-xl font-black italic">SSE <span class="text-blue-500">PLATINUM</span></div>
-                        <i class="fas fa-wifi rotate-90 text-slate-600"></i>
-                    </div>
-                    <div class="text-2xl tracking-[0.3em] font-mono mb-10">4137 8829 0112 4492</div>
-                    <div class="flex justify-between items-end">
-                        <div>
-                            <p class="text-[10px] text-slate-500 uppercase font-bold tracking-widest">Card Holder</p>
-                            <p class="text-lg font-bold">JOHN DOE</p>
-                        </div>
-                        <div class="flex -space-x-3">
-                            <div class="w-10 h-10 rounded-full bg-red-500/90"></div>
-                            <div class="w-10 h-10 rounded-full bg-yellow-500/90"></div>
-                        </div>
-                    </div>
-                </div>
+    <div class="bg-blue-600 py-12 px-6">
+        <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-white">
+            <div>
+                <p class="text-3xl font-black">20M+</p>
+                <p class="text-blue-100 text-xs uppercase font-bold tracking-widest mt-2">Active Users</p>
             </div>
             <div>
-                <h2 class="text-4xl font-black text-slate-900 mb-8">Manage your business <br>without the <span class="text-blue-600">headaches.</span></h2>
-                <div class="space-y-6">
-                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
-                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
-                            <i class="fas fa-chart-pie"></i>
+                <p class="text-3xl font-black">$40B+</p>
+                <p class="text-blue-100 text-xs uppercase font-bold tracking-widest mt-2">Annual Volume</p>
+            </div>
+            <div>
+                <p class="text-3xl font-black">150+</p>
+                <p class="text-blue-100 text-xs uppercase font-bold tracking-widest mt-2">Countries Served</p>
+            </div>
+            <div>
+                <p class="text-3xl font-black">99.9%</p>
+                <p class="text-blue-100 text-xs uppercase font-bold tracking-widest mt-2">Uptime Rate</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black text-slate-900">What Our Global Partners Say</h2>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop" class="w-14 h-14 rounded-full border-2 border-blue-600" alt="Julian">
+                        <div>
+                            <p class="font-bold">Julian Schmidt</p>
+                            <p class="text-xs text-slate-500">CTO, Berlin Tech Solutions</p>
                         </div>
-                        <p class="font-bold text-slate-700 leading-tight">Detailed spending analytics and weekly financial reports.</p>
                     </div>
-                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
-                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
-                            <i class="fas fa-receipt"></i>
+                    <p class="text-slate-600 italic">"The UK and Euro money transfer speeds are unmatched. We've managed our entire European payroll through SSE Bank without a single delay."</p>
+                </div>
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop" class="w-14 h-14 rounded-full border-2 border-blue-600" alt="Elena">
+                        <div>
+                            <p class="font-bold">Elena Rodriguez</p>
+                            <p class="text-xs text-slate-500">Founder, EcomGlobal Miami</p>
                         </div>
-                        <p class="font-bold text-slate-700 leading-tight">Automated invoicing for your global clients.</p>
                     </div>
-                    <div class="flex items-center gap-4 p-4 rounded-2xl hover:bg-slate-50 transition">
-                        <div class="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-blue-200">
-                            <i class="fas fa-headset"></i>
+                    <p class="text-slate-600 italic">"Security was my main concern, but their 256-bit encryption and instant USA transfers gave us the confidence to scale our business across borders."</p>
+                </div>
+                <div class="bg-slate-50 p-8 rounded-3xl border border-slate-100">
+                    <div class="flex items-center gap-4 mb-6">
+                        <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop" class="w-14 h-14 rounded-full border-2 border-blue-600" alt="David">
+                        <div>
+                            <p class="font-bold">David Sterling</p>
+                            <p class="text-xs text-slate-500">Director, Sterling Creative London</p>
                         </div>
-                        <p class="font-bold text-slate-700 leading-tight">Priority 24/7 support for business account holders.</p>
                     </div>
+                    <p class="text-slate-600 italic">"Switching to SSE Bank for our global invoicing was the best decision. The virtual cards make managing software subscriptions effortless."</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="faq" class="py-24 px-6 bg-slate-50">
-        <div class="max-w-3xl mx-auto">
-            <h2 class="text-3xl font-black text-center text-slate-900 mb-12">Common Questions</h2>
-            <div class="space-y-4">
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="font-bold text-slate-900 mb-2">Is my money safe with SSE Bank?</p>
-                    <p class="text-slate-500 text-sm">Absolutely. We use 256-bit AES encryption and are fully compliant with national banking security standards.</p>
+    <section id="contact" class="py-24 px-6 bg-slate-50">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-16">
+            <div>
+                <h2 class="text-4xl font-black mb-4">Contact Us</h2>
+                <div class="w-20 h-1.5 bg-blue-600 mb-10"></div>
+                <div class="space-y-8">
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm shadow-blue-100 shrink-0">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 uppercase tracking-widest text-xs mb-1">Location</p>
+                            <p class="text-slate-600">301 East Water Street, Charlottesville, VA<br>22904 Virginia, USA</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm shadow-blue-100 shrink-0">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 uppercase tracking-widest text-xs mb-1">Email</p>
+                            <p class="text-slate-600">support@ssebank.ink</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-6">
+                        <div class="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-blue-600 shadow-sm shadow-blue-100 shrink-0">
+                            <i class="fas fa-phone-alt"></i>
+                        </div>
+                        <div>
+                            <p class="font-bold text-slate-900 uppercase tracking-widest text-xs mb-1">Phone</p>
+                            <p class="text-slate-600 font-bold">+1 (949) 758‑4779</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="font-bold text-slate-900 mb-2">How long do loan approvals take?</p>
-                    <p class="text-slate-500 text-sm">Approvals are instant based on your transaction history. Once approved, disbursement happens in under 60 seconds.</p>
-                </div>
-                <div class="bg-white p-6 rounded-2xl border border-slate-100">
-                    <p class="font-bold text-slate-900 mb-2">Can I use SSE Bank for international payments?</p>
-                    <p class="text-slate-500 text-sm">Yes! You can receive payments in major currencies and withdraw directly to your local balance.</p>
-                </div>
+            </div>
+            <div class="bg-white p-8 rounded-[3rem] shadow-xl border border-slate-100">
+                <form class="space-y-4" action="mailto:support@vintora.ink" method="POST" enctype="text/plain">
+                    <input type="text" name="name" placeholder="Your Name" required class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-600 outline-none">
+                    <input type="email" name="email" placeholder="Business Email" required class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-600 outline-none">
+                    <textarea name="message" placeholder="Message" rows="4" required class="w-full px-6 py-4 bg-slate-50 rounded-2xl border-none focus:ring-2 focus:ring-blue-600 outline-none"></textarea>
+                    <button class="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-blue-100 hover:bg-blue-700 transition">Send Message</button>
+                </form>
             </div>
         </div>
     </section>
 
     <footer class="bg-slate-900 text-slate-400 py-12 px-6">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8 border-b border-white/5 pb-12 mb-8">
             <div class="text-white font-black text-xl">SSEBANK</div>
             <div class="flex space-x-6 text-sm font-bold">
-                <a href="#" class="hover:text-white">Privacy</a>
-                <a href="#" class="hover:text-white">Terms</a>
-                <a href="#" class="hover:text-white">Contact</a>
+                <a href="#" class="hover:text-white transition">Privacy</a>
+                <a href="#" class="hover:text-white transition">Terms</a>
+                <a href="#" class="hover:text-white transition">AML Policy</a>
             </div>
-            <p class="text-xs">© 2026 SSE Bank. Built with Precision.</p>
+            <div class="flex gap-4 text-xl">
+                <a href="#" class="hover:text-blue-500 transition"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="hover:text-blue-500 transition"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="hover:text-blue-500 transition"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-[10px] leading-relaxed uppercase tracking-widest max-w-4xl mx-auto">
+                SSE Bank is a financial technology company, not a bank. Banking services provided by Vintora Bank, N.A.; Member FDIC. The SSE Bank Visa® Debit Card is issued by Vintora Bank, N.A. pursuant to a license from Visa U.S.A. Inc. and may be used everywhere Visa debit cards are accepted.
+            </p>
+            <p class="text-xs mt-6">© 2026 SSE Bank. All rights reserved.</p>
         </div>
     </footer>
 
-   <script>
-    // 1. Mobile Menu Toggle
-    const btn = document.getElementById('mobileMenuBtn');
-    const menu = document.getElementById('mobileMenu');
-    
-    btn.onclick = () => {
-        menu.classList.toggle('hidden');
-    };
+    <script>
+        const btn = document.getElementById('mobileMenuBtn');
+        const menu = document.getElementById('mobileMenu');
+        
+        btn.onclick = () => {
+            menu.classList.toggle('hidden');
+        };
 
-    // 2. Close mobile menu when a link is clicked
-    document.querySelectorAll('#mobileMenu a').forEach(link => {
-        link.onclick = () => menu.classList.add('hidden');
-    });
-
-    // 3. Feature placeholders
-    function handlePricing() {
-        alert("We are currently updating our 2026 pricing tiers. Contact support for immediate inquiries.");
-    }
-
-    // 4. Console log to verify every button is wired
-    document.querySelectorAll('button').forEach(button => {
-        button.addEventListener('click', () => {
-            console.log(`Button clicked: ${button.innerText}`);
+        document.querySelectorAll('#mobileMenu a').forEach(link => {
+            link.onclick = () => menu.classList.add('hidden');
         });
-    });
-</script>
+
+        function handlePricing() {
+            alert("Contact our accounts team at support@vintora.ink to discuss custom business limits.");
+        }
+    </script>
 </body>
 </html>

@@ -6,76 +6,122 @@
     <title>Secure Access | SSE Bank</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Smooth transition for auth toggle */
+        #nameContainer, #regExtraFields {
+            transition: all 0.3s ease-in-out;
+        }
+        /* Custom scrollbar for the language dropdown */
+        #lang-dropdown::-webkit-scrollbar {
+            width: 4px;
+        }
+        #lang-dropdown::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+    </style>
 </head>
-<body class="bg-slate-50 font-sans min-h-screen flex items-center justify-center p-6">
+<body class="bg-slate-50 font-sans min-h-screen flex flex-col items-center justify-center p-4 md:p-6">
+
+    <nav class="w-full max-w-4xl mb-4 flex items-center justify-between px-2">
+        <a href="index.html" class="flex items-center gap-2 text-slate-600 hover:text-blue-700 transition font-bold">
+            <i class="fas fa-arrow-left"></i>
+            <span data-i18n="exitHome">Exit to Home</span>
+        </a>
+
+        <div class="relative inline-block text-left" id="lang-switcher">
+            <button id="lang-btn" class="flex items-center space-x-2 bg-white border border-slate-200 px-3 py-2 rounded-xl hover:border-blue-600 transition shadow-sm">
+                <span id="current-lang-flag">🇺🇸</span>
+                <span class="text-slate-700 text-xs font-bold uppercase tracking-wider" id="current-lang-name">EN</span>
+                <i class="fas fa-chevron-down text-[10px] text-slate-400"></i>
+            </button>
+
+            <div id="lang-dropdown" class="hidden absolute right-0 mt-2 w-32 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden">
+                <button class="lang-option w-full flex items-center space-x-3 px-4 py-3 hover:bg-slate-50 transition-colors" data-lang="en">
+                    <span>🇺🇸</span> <span class="text-slate-700 text-xs font-bold">EN</span>
+                </button>
+                <button class="lang-option w-full flex items-center space-x-3 px-4 py-3 hover:bg-slate-50 transition-colors" data-lang="fr">
+                    <span>🇫🇷</span> <span class="text-slate-700 text-xs font-bold">FR</span>
+                </button>
+                <button class="lang-option w-full flex items-center space-x-3 px-4 py-3 hover:bg-slate-50 transition-colors" data-lang="es">
+                    <span>🇪🇸</span> <span class="text-slate-700 text-xs font-bold">ES</span>
+                </button>
+            </div>
+        </div>
+
+        <span class="text-xs font-black text-blue-600 tracking-tighter md:hidden">SSEBANK</span>
+    </nav>
 
     <div id="toastContainer" class="fixed top-5 right-5 z-50 pointer-events-none"></div>
 
-    <div class="bg-white w-full max-w-4xl grid md:grid-cols-2 rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+    <div class="bg-white w-full max-w-4xl grid md:grid-cols-2 rounded-2xl md:rounded-3xl shadow-xl overflow-hidden border border-slate-100">
         
         <div class="bg-blue-700 p-12 text-white flex flex-col justify-between hidden md:flex">
             <div>
-                <h2 class="text-3xl font-bold">SSE BANK</h2>
-                <p class="mt-4 text-blue-100 leading-relaxed">The world's most secure digital bank for entrepreneurs.</p>
+                <h2 class="text-3xl font-bold tracking-tight">SSE BANK</h2>
+                <p class="mt-4 text-blue-100 leading-relaxed text-lg" data-i18n="heroText">The world's most secure digital bank for entrepreneurs.</p>
             </div>
             <div class="space-y-4">
-                <div class="flex items-center space-x-3 text-sm">
-                    <span class="bg-blue-500 p-2 rounded-lg">✓</span>
-                    <span>Instant Account Opening</span>
+                <div class="flex items-center space-x-3 text-sm font-medium">
+                    <span class="bg-blue-500/30 p-2 rounded-lg"><i class="fas fa-check"></i></span>
+                    <span data-i18n="feat1">Instant Account Opening</span>
+                </div>
+                <div class="flex items-center space-x-3 text-sm font-medium">
+                    <span class="bg-blue-500/30 p-2 rounded-lg"><i class="fas fa-lock"></i></span>
+                    <span data-i18n="feat2">Bank-Grade Encryption</span>
                 </div>
             </div>
         </div>
 
-        <div class="p-8 md:p-12 overflow-y-auto max-h-[90vh]">
+        <div class="p-6 md:p-12">
             <div class="mb-8">
-                <h3 class="text-2xl font-bold text-slate-800" id="formTitle">Create Account</h3>
-                <p class="text-slate-500 text-sm mt-2" id="formSub">Start your journey with SSE Bank today.</p>
+                <h3 class="text-2xl font-bold text-slate-800" id="formTitle" data-i18n="createAcc">Create Account</h3>
+                <p class="text-slate-500 text-sm mt-2" id="formSub" data-i18n="subText">Start your journey with SSE Bank today.</p>
             </div>
 
-            <form id="authForm" class="space-y-4">
+            <form id="authForm" class="space-y-5">
                 <div id="nameContainer">
-                    <label class="block text-sm font-semibold text-slate-700">Full Name</label>
-                    <input type="text" id="fullName" placeholder="John Doe" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" data-i18n="labelName">Full Name</label>
+                    <input type="text" id="fullName" placeholder="John Doe" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700">Email Address</label>
-                    <input type="email" id="email" required placeholder="name@company.com" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" data-i18n="labelEmail">Email Address</label>
+                    <input type="email" id="email" required placeholder="name@company.com" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
                 </div>
 
-                <div id="regExtraFields">
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold text-slate-700">Country</label>
-                        <select id="countrySelect" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                <div id="regExtraFields" class="space-y-5">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" data-i18n="labelCountry">Country</label>
+                        <select id="countrySelect" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition appearance-none">
                             <option value="">Loading countries...</option>
                         </select>
                     </div>
 
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold text-slate-700">Currency & Symbol</label>
-                        <input type="text" id="currencyDisplay" readonly placeholder="Automatic" class="w-full mt-1 p-3 bg-slate-100 border border-slate-200 rounded-xl text-slate-500">
+                    <div>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" data-i18n="labelCurrency">Currency & Symbol</label>
+                        <input type="text" id="currencyDisplay" readonly placeholder="Automatic" class="w-full p-3.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-500 font-mono">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-slate-700">Password</label>
-                    <input type="password" id="password" required placeholder="••••••••" class="w-full mt-1 p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 transition">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-500 mb-1" data-i18n="labelPass">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••" class="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-600 focus:bg-white transition">
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-blue-700 text-white p-4 rounded-xl font-bold hover:bg-blue-800 transition shadow-lg mt-4">
-                    Continue
+                <button type="submit" id="submitBtn" class="w-full bg-blue-700 text-white p-4 rounded-xl font-bold hover:bg-blue-800 active:scale-[0.98] transition shadow-lg shadow-blue-100 mt-2">
+                    <span data-i18n="btnContinue">Continue</span>
                 </button>
             </form>
 
-            <div class="mt-8 text-center text-sm">
-                <span class="text-slate-500" id="toggleText">Already have an account?</span>
-                <button type="button" onclick="toggleAuth()" class="text-blue-700 font-bold ml-1 hover:underline" id="toggleBtn">Login here</button>
+            <div class="mt-8 text-center text-sm border-t border-slate-50 pt-6">
+                <span class="text-slate-500" id="toggleText" data-i18n="alreadyAcc">Already have an account?</span>
+                <button type="button" onclick="toggleAuth()" class="text-blue-700 font-bold ml-1 hover:underline" id="toggleBtn" data-i18n="loginLink">Login here</button>
             </div>
         </div>
     </div>
 
     <script type="module">
-        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyDBFe-wSC7xuzcTjrr6sEDJo7q5dwNiq4s",
             authDomain: "loanify-208f8.firebaseapp.com",
@@ -93,61 +139,85 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // --- Country & Currency Loader ---
+        // Language Translations
+        const translations = {
+            en: {
+                exitHome: "Exit to Home", heroText: "The world's most secure digital bank for entrepreneurs.", feat1: "Instant Account Opening", feat2: "Bank-Grade Encryption", createAcc: "Create Account", subText: "Start your journey with SSE Bank today.", labelName: "Full Name", labelEmail: "Email Address", labelCountry: "Country", labelCurrency: "Currency & Symbol", labelPass: "Password", btnContinue: "Continue", alreadyAcc: "Already have an account?", loginLink: "Login here", welcomeBack: "Welcome Back"
+            },
+            fr: {
+                exitHome: "Retour à l'accueil", heroText: "La banque numérique la plus sécurisée au monde pour les entrepreneurs.", feat1: "Ouverture de compte instantanée", feat2: "Cryptage de niveau bancaire", createAcc: "Créer un compte", subText: "Commencez votre voyage avec SSE Bank aujourd'hui.", labelName: "Nom complet", labelEmail: "Adresse e-mail", labelCountry: "Pays", labelCurrency: "Devise et symbole", labelPass: "Mot de passe", btnContinue: "Continuer", alreadyAcc: "Vous avez déjà un compte?", loginLink: "Connectez-vous ici", welcomeBack: "Content de vous revoir"
+            },
+            es: {
+                exitHome: "Salir al Inicio", heroText: "El banco digital más seguro del mundo para emprendedores.", feat1: "Apertura de cuenta instantánea", feat2: "Cifrado de nivel bancario", createAcc: "Crear cuenta", subText: "Comience su viaje con SSE Bank hoy.", labelName: "Nombre completo", labelEmail: "Correo electrónico", labelCountry: "País", labelCurrency: "Moneda y símbolo", labelPass: "Contraseña", btnContinue: "Continuar", alreadyAcc: "¿Ya tienes una cuenta?", loginLink: "Inicie sesión aquí", welcomeBack: "Bienvenido de nuevo"
+            }
+        };
+
+        // Language Switcher Logic
+        const langBtn = document.getElementById('lang-btn');
+        const langDropdown = document.getElementById('lang-dropdown');
+        const langOptions = document.querySelectorAll('.lang-option');
+
+        langBtn.onclick = () => langDropdown.classList.toggle('hidden');
+        window.onclick = (e) => { if(!document.getElementById('lang-switcher').contains(e.target)) langDropdown.classList.add('hidden'); };
+
+        langOptions.forEach(opt => {
+            opt.onclick = () => {
+                const lang = opt.dataset.lang;
+                document.getElementById('current-lang-flag').innerText = opt.querySelector('span:first-child').innerText;
+                document.getElementById('current-lang-name').innerText = opt.dataset.lang.toUpperCase();
+                
+                document.querySelectorAll('[data-i18n]').forEach(el => {
+                    const key = el.getAttribute('data-i18n');
+                    if(translations[lang][key]) el.innerText = translations[lang][key];
+                });
+                langDropdown.classList.add('hidden');
+            };
+        });
+
         async function loadCountries() {
             const select = document.getElementById('countrySelect');
             const currencyInput = document.getElementById('currencyDisplay');
-            
             try {
                 const response = await fetch('https://restcountries.com/v3.1/all?fields=name,currencies');
                 const data = await response.json();
-                
                 select.innerHTML = '<option value="">Select Country</option>';
                 const sorted = data.sort((a, b) => a.name.common.localeCompare(b.name.common));
-                
                 sorted.forEach(country => {
                     const code = Object.keys(country.currencies || {})[0];
                     const symbol = code ? country.currencies[code].symbol : '';
                     if (!code) return;
-
                     const opt = document.createElement('option');
                     opt.value = country.name.common;
                     opt.textContent = country.name.common;
-                    // We store the clean symbol and code in the dataset
                     opt.dataset.code = code;
                     opt.dataset.symbol = symbol;
                     opt.dataset.currency = `${code} (${symbol})`;
                     select.appendChild(opt);
                 });
-
                 select.onchange = () => {
                     const selected = select.options[select.selectedIndex];
                     currencyInput.value = selected.dataset.currency || "";
                 };
-            } catch (err) {
-                select.innerHTML = '<option value="">Error loading list</option>';
-            }
+            } catch (err) { select.innerHTML = '<option value="">Error</option>'; }
         }
         loadCountries();
 
-        // --- Toggle Logic ---
         let isLogin = false;
         window.toggleAuth = function() {
             isLogin = !isLogin;
-            document.getElementById('formTitle').innerText = isLogin ? "Welcome Back" : "Create Account";
-            document.getElementById('nameContainer').style.display = isLogin ? "none" : "block";
-            document.getElementById('regExtraFields').style.display = isLogin ? "none" : "block";
-            document.getElementById('toggleBtn').innerText = isLogin ? "Register here" : "Login here";
-            document.getElementById('submitBtn').innerText = isLogin ? "Login" : "Continue";
+            const lang = document.getElementById('current-lang-name').innerText.toLowerCase();
+            document.getElementById('formTitle').innerText = isLogin ? translations[lang].welcomeBack : translations[lang].createAcc;
+            document.getElementById('nameContainer').classList.toggle('hidden', isLogin);
+            document.getElementById('regExtraFields').classList.toggle('hidden', isLogin);
+            document.getElementById('toggleBtn').innerText = isLogin ? translations[lang].createAcc + " here" : translations[lang].loginLink;
+            document.getElementById('submitBtn').querySelector('span').innerText = isLogin ? "Login" : translations[lang].btnContinue;
         };
 
-        // --- Auth Logic (Updated for Dynamic Currency) ---
         document.getElementById('authForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const fullName = document.getElementById('fullName').value;
-            
             const countrySelect = document.getElementById('countrySelect');
             const selectedOpt = countrySelect.options[countrySelect.selectedIndex];
 
@@ -155,8 +225,6 @@
                 if (isLogin) {
                     const userCredential = await signInWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-
-                    // Fetch user settings from Firestore to sync localStorage on login
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         const userData = userDoc.data();
@@ -166,16 +234,10 @@
                 } else {
                     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                     const user = userCredential.user;
-                    
-                    // Extract clean values from the selection
                     const code = selectedOpt.dataset.code || "USD";
                     const symbol = selectedOpt.dataset.symbol || "$";
-
-                    // Save to localStorage so the dashboard updates IMMEDIATELY
                     localStorage.setItem('userCurrencySymbol', symbol);
                     localStorage.setItem('userCurrencyCode', code);
-
-                    // Save to Firestore for permanent record
                     await setDoc(doc(db, "users", user.uid), {
                         name: fullName,
                         email: email,
@@ -188,11 +250,8 @@
                         isVerified: false
                     });
                 }
-                // Redirect to dashboard
                 window.location.href = "dashboard.html";
-            } catch (error) {
-                alert(error.message);
-            }
+            } catch (error) { alert(error.message); }
         });
     </script>
 </body>
