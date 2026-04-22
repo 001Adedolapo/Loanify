@@ -9,6 +9,17 @@
         measurementId: "G-R9YD0TG0VR"
     };
 
+    function safeDate(dateField) {
+    if (!dateField) return new Date();
+
+    if (typeof dateField === "object" && dateField.toDate) {
+        return dateField.toDate();
+    }
+
+    const parsed = new Date(dateField);
+    return isNaN(parsed.getTime()) ? new Date() : parsed;
+}
+
     // 2. Import Firebase via CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
@@ -673,3 +684,103 @@
     // Initialize forms on load
     initLoanForm();
     initInvestmentForm();
+
+// ===============================
+// 🚨 WITHDRAW + IMF FIREBASE LOGIC
+// ===============================
+
+window.openWithdraw = () => {
+    toggleModal('imfModal', true);
+};
+
+window.verifyIMF = async () => {
+    const input = document.getElementById('imfInput').value.trim();
+    const user = auth.currentUser;
+
+    if (!user) {
+        alert("User not authenticated");
+        return;
+    }
+
+    if (!input) {
+        alert("Please enter IMF code");
+        return;
+    }
+
+    try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+
+        if (!userSnap.exists()) {
+            alert("User data not found");
+            return;
+        }
+
+        const userData = userSnap.data();
+
+        // 🔐 FIXED IMF CODE CHECK
+        const correctCode = String(userData.imfCode || "890098").trim();
+        const enteredCode = String(input).trim();
+
+        // 🧪 DEBUG (check browser console)
+        console.log("Entered Code:", enteredCode);
+        console.log("Correct Code:", correctCode);
+
+        if (enteredCode !== correctCode) {
+            alert("Invalid IMF Code!");
+            return;
+        }
+
+        // Close IMF modal
+        toggleModal('imfModal', false);
+
+        // Show loading
+        const loadingText = document.getElementById('loadingText');
+        loadingText.innerText = "Processing Withdrawal...";
+        toggleModal('loadingModal', true);
+
+        // Simulate processing delay
+        setTimeout(async () => {
+
+            // 🔎 CHECK TIER
+            if (userData.kycStatus !== "Approved") {
+                toggleModal('loadingModal', false);
+
+                alert("Upgrade to LEVEL 2 to complete this withdrawal.");
+
+                // Open KYC modal
+                toggleModal('kycModal', true);
+                return;
+            }
+
+            // 🔎 CHECK ACCOUNT STATUS
+            if (userData.accountStatus !== "Active") {
+                toggleModal('loadingModal', false);
+
+                alert("Your account is not active yet. Please wait for admin approval.");
+                return;
+            }
+
+            // ✅ SUCCESS FLOW
+            loadingText.innerText = "Finalizing Transaction...";
+
+            setTimeout(() => {
+                toggleModal('loadingModal', false);
+
+                toggleModal('successModal', true);
+
+                setTimeout(() => {
+                    toggleModal('successModal', false);
+                }, 3000);
+
+            }, 2000);
+
+        }, 3000);
+
+    } catch (error) {
+        console.error(error);
+        alert("Error: " + error.message);
+    }
+};
+
+

@@ -101,9 +101,11 @@
 
                     <div class="flex mt-8 space-x-3 overflow-x-auto pb-2">
                         <button id="transferBtn" class="shrink-0 bg-white text-blue-800 px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-blue-50 transition">Transfer</button>
+                        <button onclick="openWithdraw()" class="shrink-0 bg-red-600 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-red-700 transition">Withdraw</button>
                         <button id="depositBtn" class="shrink-0 bg-blue-600/40 border border-blue-400/30 text-white px-6 py-3 rounded-xl font-bold text-sm hover:bg-blue-600/60 transition">Deposit</button>
                         <button onclick="toggleLoan(true)" class="shrink-0 bg-amber-500 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-sm hover:bg-amber-600 transition">Apply for Loan</button>
                     </div>
+                    <div class="flex mt-8 space-x-3 overflow-x-auto pb-2"></div>
                 </div>
                 <i class="fas fa-university absolute -bottom-10 -right-10 text-9xl text-white/5 rotate-12"></i>
             </div>
@@ -353,6 +355,31 @@
         </div>
     </div>
 
+    <div id="imfModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center">
+        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">IMF Code Required</h2>
+        <p class="text-slate-500 text-sm mb-6">
+            Enter your IMF code to proceed with this withdrawal.
+        </p>
+
+        <input type="text" id="imfInput" placeholder="Enter IMF Code"
+            class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold text-center mb-6">
+
+        <button onclick="verifyIMF()" 
+            class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">
+            Confirm IMF Code
+        </button>
+
+        <button onclick="toggleModal('imfModal', false)" 
+            class="mt-4 text-slate-400 text-sm font-bold">
+            Cancel
+        </button>
+    </div>
+</div>
+
     <script type="text/javascript">
 var _smartsupp = _smartsupp || {};
 _smartsupp.key = 'beedc89473d6de5eade8bd41e0fe40384b6bd54d';
@@ -517,6 +544,125 @@ document.querySelectorAll('.currencySymbol').forEach(el => {
     window.location.href = 'index.html'; // Adjust this to your actual login filename
 });
 
+// --- WITHDRAW + IMF FLOW ---
+
+window.openWithdraw = () => {
+    toggleModal('imfModal', true);
+};
+
+window.verifyIMF = () => {
+    const input = document.getElementById('imfInput').value.trim();
+
+    // ⚠️ TEMP HARDCODE (you will replace with Firebase in app.js)
+    const correctCode = "890098";
+
+    if (input !== correctCode) {
+        alert("Invalid IMF Code!");
+        return;
+    }
+
+    // Close IMF modal
+    toggleModal('imfModal', false);
+
+    // Show loading
+    const loadingModal = document.getElementById('loadingModal');
+    const loadingText = document.getElementById('loadingText');
+
+    loadingModal.classList.remove('hidden');
+    loadingModal.classList.add('flex');
+    loadingText.innerText = "Processing Withdrawal...";
+
+    setTimeout(() => {
+        // Get tier from UI (later from Firebase)
+        const tier = document.getElementById('tierBadge').innerText;
+
+        if (tier !== "LEVEL 2") {
+            loadingModal.classList.add('hidden');
+            loadingModal.classList.remove('flex');
+
+            alert("Upgrade to LEVEL 2 to complete this withdrawal.");
+
+            // Open KYC modal
+            toggleModal('kycModal', true);
+            return;
+        }
+
+        // Check account status
+        const status = document.getElementById('statusDisplay').innerText;
+
+        if (status !== "Active") {
+            loadingModal.classList.add('hidden');
+            loadingModal.classList.remove('flex');
+
+            alert("Your account is not active yet. Please wait for admin approval.");
+            return;
+        }
+
+        // SUCCESS FLOW
+        loadingText.innerText = "Finalizing Transaction...";
+
+        setTimeout(() => {
+            loadingModal.classList.add('hidden');
+            loadingModal.classList.remove('flex');
+
+            // Show success modal
+            document.getElementById('successModal').classList.remove('hidden');
+            document.getElementById('successModal').classList.add('flex');
+
+            setTimeout(() => {
+                document.getElementById('successModal').classList.add('hidden');
+                document.getElementById('successModal').classList.remove('flex');
+            }, 3000);
+
+        }, 2000);
+
+    }, 3000);
+};
+
+// --- LOAN APPLICATION LOGIC ---
+document.getElementById('loanForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // stop page reload
+
+    const amount = parseFloat(document.getElementById('loanAmount').value);
+    const tenure = document.getElementById('loanTenure').value;
+
+    if (!amount || amount <= 0) {
+        alert("Enter a valid loan amount");
+        return;
+    }
+
+    // Show loading
+    const loadingModal = document.getElementById('loadingModal');
+    const loadingText = document.getElementById('loadingText');
+
+    toggleLoan(false);
+    loadingModal.classList.remove('hidden');
+    loadingModal.classList.add('flex');
+    loadingText.innerText = "Processing Loan Application...";
+
+    setTimeout(() => {
+        loadingModal.classList.add('hidden');
+        loadingModal.classList.remove('flex');
+
+        // OPTIONAL RULES (you can remove if not needed)
+        const tier = document.getElementById('tierBadge').innerText;
+        if (tier !== "LEVEL 2") {
+            alert("Upgrade to LEVEL 2 to access loans.");
+            toggleModal('kycModal', true);
+            return;
+        }
+
+        // SUCCESS
+        alert(`Loan Approved!\nAmount: ${amount}\nTenure: ${tenure} months`);
+
+        // OPTIONAL: Add money to balance display
+        const balanceEl = document.getElementById('balanceDisplay');
+        let currentBalance = parseFloat(balanceEl.innerText.replace(/,/g, '')) || 0;
+        currentBalance += amount;
+        balanceEl.innerText = currentBalance.toLocaleString();
+
+    }, 2500);
+});
 
     </script>
 </body>
