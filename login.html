@@ -190,7 +190,7 @@
                     opt.value = country.name.common;
                     opt.textContent = country.name.common;
                     opt.dataset.code = code;
-                    opt.dataset.symbol = symbol;
+                    opt.dataset.symbol = symbol;    
                     opt.dataset.currency = `${code} (${symbol})`;
                     select.appendChild(opt);
                 });
@@ -247,7 +247,8 @@
                         country: selectedOpt.value,
                         accountNumber: Math.floor(1000000000 + Math.random() * 9000000000),
                         createdAt: serverTimestamp(),
-                        isVerified: false
+                        isVerified: false,
+                        accountStatus: "Inactive",
                     });
                 }
                 window.location.href = "dashboard.html";

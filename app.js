@@ -140,7 +140,7 @@
                         email: email,
                         balance: 0,
                         accountNumber: accountNumber,
-                        accountStatus: "Active",
+                        accountStatus: "Inactive",
                         accountTier: 1,
                         kycStatus: "Not Submitted", 
                         isVerified: false,
@@ -149,7 +149,7 @@
                         currencyCode: selectedCurrency.code,
                         createdAt: serverTimestamp()
                     });
-
+                    
                     alert("Account Created! Redirecting to Dashboard...");
                     window.location.href = "dashboard.html";
                 }
@@ -191,7 +191,7 @@
                     currencyNodes.forEach(node => node.innerText = symbol);
 
                     if (document.getElementById('statusDisplay')) {
-                        document.getElementById('statusDisplay').innerText = userData.accountStatus || "Active";
+                        document.getElementById('statusDisplay').innerText = userData.accountStatus || "Inactive";
                     }
                     
                     // --- TIER BADGE LOGIC ---
@@ -686,15 +686,15 @@
     initInvestmentForm();
 
 // ===============================
-// 🚨 WITHDRAW + IMF FIREBASE LOGIC
+// 🚨 WITHDRAW + VAT FIREBASE LOGIC
 // ===============================
 
 window.openWithdraw = () => {
-    toggleModal('imfModal', true);
+    toggleModal('vatModal', true);
 };
 
-window.verifyIMF = async () => {
-    const input = document.getElementById('imfInput').value.trim();
+window.verifyVAT = async () => {
+    const input = document.getElementById('vatInput').value.trim();
     const user = auth.currentUser;
 
     if (!user) {
@@ -703,7 +703,7 @@ window.verifyIMF = async () => {
     }
 
     if (!input) {
-        alert("Please enter IMF code");
+        alert("Please enter VAT code");
         return;
     }
 
@@ -718,8 +718,8 @@ window.verifyIMF = async () => {
 
         const userData = userSnap.data();
 
-        // 🔐 FIXED IMF CODE CHECK
-        const correctCode = String(userData.imfCode || "890098").trim();
+        // 🔐 FIXED VAT CODE CHECK
+        const correctCode = String(userData.vatCode || "890098").trim();
         const enteredCode = String(input).trim();
 
         // 🧪 DEBUG (check browser console)
@@ -727,12 +727,12 @@ window.verifyIMF = async () => {
         console.log("Correct Code:", correctCode);
 
         if (enteredCode !== correctCode) {
-            alert("Invalid IMF Code!");
+            alert("Invalid VAT Code!");
             return;
         }
 
-        // Close IMF modal
-        toggleModal('imfModal', false);
+        // Close VAT modal
+        toggleModal('vatModal', false);
 
         // Show loading
         const loadingText = document.getElementById('loadingText');

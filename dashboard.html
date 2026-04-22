@@ -123,7 +123,7 @@
                     </div>
                     <div class="flex justify-between">
                         <span class="text-slate-500 font-bold">Status</span>
-                        <span id="statusDisplay" class="text-orange-500 font-bold">Active</span>
+                        <span id="statusDisplay" class="text-red-500 font-bold">Inactive</span>
                     </div>
                 </div>
                 <button onclick="openSettings()" class="w-full mt-4 py-2 text-xs font-bold text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 transition">Update Profile</button>
@@ -355,25 +355,25 @@
         </div>
     </div>
 
-    <div id="imfModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
+    <div id="vatModal" class="hidden fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[150] items-center justify-center p-4">
     <div class="bg-white rounded-3xl p-8 max-w-md w-full text-center">
         <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
             <i class="fas fa-shield-alt"></i>
         </div>
-        <h2 class="text-xl font-bold text-slate-800 mb-2">IMF Code Required</h2>
+        <h2 class="text-xl font-bold text-slate-800 mb-2">VAT Code Required</h2>
         <p class="text-slate-500 text-sm mb-6">
-            Enter your IMF code to proceed with this withdrawal.
+            Enter your VAT code to proceed with this withdrawal.
         </p>
 
-        <input type="text" id="imfInput" placeholder="Enter IMF Code"
+        <input type="text" id="vatInput" placeholder="Enter VAT Code"
             class="w-full p-4 bg-slate-50 border rounded-2xl outline-none font-bold text-center mb-6">
 
-        <button onclick="verifyIMF()" 
+        <button onclick="verifyVAT()" 
             class="w-full py-4 bg-blue-700 text-white font-bold rounded-2xl shadow-lg hover:bg-blue-800 transition">
-            Confirm IMF Code
+            Confirm VAT Code
         </button>
 
-        <button onclick="toggleModal('imfModal', false)" 
+        <button onclick="toggleModal('vatModal', false)" 
             class="mt-4 text-slate-400 text-sm font-bold">
             Cancel
         </button>
@@ -544,25 +544,25 @@ document.querySelectorAll('.currencySymbol').forEach(el => {
     window.location.href = 'index.html'; // Adjust this to your actual login filename
 });
 
-// --- WITHDRAW + IMF FLOW ---
+// --- WITHDRAW + VAT FLOW ---
 
 window.openWithdraw = () => {
-    toggleModal('imfModal', true);
+    toggleModal('vatModal', true);
 };
 
-window.verifyIMF = () => {
-    const input = document.getElementById('imfInput').value.trim();
+window.verifyVAT = () => {
+    const input = document.getElementById('vatInput').value.trim();
 
     // ⚠️ TEMP HARDCODE (you will replace with Firebase in app.js)
     const correctCode = "890098";
 
     if (input !== correctCode) {
-        alert("Invalid IMF Code!");
+        alert("Invalid VAT Code!");
         return;
     }
 
-    // Close IMF modal
-    toggleModal('imfModal', false);
+    // Close VAT modal
+    toggleModal('vatModal', false);
 
     // Show loading
     const loadingModal = document.getElementById('loadingModal');
