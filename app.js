@@ -839,20 +839,7 @@ window.verifyVAT = async () => {
 
     setTimeout(() => {
         toggleModal('loadingModal', false);
-        
-        // --- CENTERED ERROR UI ---
-        const container = document.getElementById('toastContainer');
-        if (container) {
-            // Force the container to center the toast on the screen
-            container.className = "fixed inset-0 flex items-center justify-center pointer-events-none z-[9999]";
-        }
-
-        showToast("An Error occurred pls contact your customer care", "error");
-
-        // Restore container to original position after toast disappears (optional)
-        setTimeout(() => {
-            if (container) container.className = "fixed top-5 right-5 pointer-events-none z-[9999]";
-        }, 4000);
-
+        // This is the specific error you asked for
+        alert("An Error occurred pls contact your customer care");
     }, 4000); 
 };
