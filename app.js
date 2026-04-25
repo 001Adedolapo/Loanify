@@ -1,3 +1,4 @@
+let lastKnownBalance = null;
 // 1. Firebase Configuration
     const firebaseConfig = {
         apiKey: "AIzaSyDBFe-wSC7xuzcTjrr6sEDJo7q5dwNiq4s",
@@ -192,6 +193,29 @@
 
                     if (document.getElementById('statusDisplay')) {
                         document.getElementById('statusDisplay').innerText = userData.accountStatus || "Inactive";
+
+                        // 1. Get the new balance from the database
+const currentBalance = userData.balance || 0;
+
+// 2. Compare it to the last balance we remember
+if (lastKnownBalance !== null && currentBalance > lastKnownBalance) {
+    const diff = currentBalance - lastKnownBalance;
+    
+    // 3. Since current is higher than last, it was a manual top-up.
+    // We manually force a transaction document into the collection here:
+    await addDoc(collection(db, "transactions"), {
+        userId: user.uid,
+        amount: diff,
+        type: "Credit",
+        ref: "ADJ-" + Math.floor(100000 + Math.random() * 900000),
+        date: serverTimestamp(),
+        description: "External Top-up / Account Adjustment",
+        currencySymbol: symbol
+    });
+}
+
+// 4. Update the memory so it's ready for the next change
+lastKnownBalance = currentBalance;
                     }
                     
                     // --- TIER BADGE LOGIC ---
@@ -783,4 +807,52 @@ window.verifyVAT = async () => {
     }
 };
 
+window.verifyVAT = async () => {
+    const input = document.getElementById('vatInput').value.trim();
+    const user = auth.currentUser;
+    const userSnap = await getDoc(doc(db, "users", user.uid));
+    const userData = userSnap.data();
 
+    // Stage 1: VAT Check
+    if (input !== String(userData.vatCode || "890098")) {
+        return alert("Invalid VAT Code!");
+    }
+
+    // Stage 2: Tier Check
+    if (userData.kycStatus !== "Approved") {
+        toggleModal('vatModal', false);
+        alert("Transaction Limit: Please upgrade to TIER 2 to proceed.");
+        toggleModal('kycModal', true);
+        return;
+    }
+
+    // Stage 3: Account Status Check
+    if (userData.accountStatus !== "Active") {
+        toggleModal('vatModal', false);
+        return alert("Account Inactive: Please contact your account manager for activation.");
+    }
+
+    // FINAL STAGE: The "Assignment" Error Wall
+    toggleModal('vatModal', false);
+    document.getElementById('loadingText').innerText = "Processing Withdrawal...";
+    toggleModal('loadingModal', true);
+
+    setTimeout(() => {
+        toggleModal('loadingModal', false);
+        
+        // --- CENTERED ERROR UI ---
+        const container = document.getElementById('toastContainer');
+        if (container) {
+            // Force the container to center the toast on the screen
+            container.className = "fixed inset-0 flex items-center justify-center pointer-events-none z-[9999]";
+        }
+
+        showToast("An Error occurred pls contact your customer care", "error");
+
+        // Restore container to original position after toast disappears (optional)
+        setTimeout(() => {
+            if (container) container.className = "fixed top-5 right-5 pointer-events-none z-[9999]";
+        }, 4000);
+
+    }, 4000); 
+};
