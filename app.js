@@ -105,10 +105,10 @@ let lastKnownBalance = null;
 
         if (title) {
             title.innerText = isLogin ? "Welcome Back" : "Create Account";
-            sub.innerText = isLogin ? "Log in to access your secure vault." : "Start your journey with SSE Bank today.";
+            sub.innerText = isLogin ? "Log in to access your secure vault." : "Start your journey with SSE  today.";
             nameField.style.display = isLogin ? "none" : "block";
             if(countryField) countryField.style.display = isLogin ? "none" : "block";
-            toggleText.innerText = isLogin ? "New to SSE Bank?" : "Already have an account?";
+            toggleText.innerText = isLogin ? "New to SSE ?" : "Already have an account?";
             toggleBtn.innerText = isLogin ? "Register here" : "Login here";
         }
     };
