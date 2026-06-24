@@ -134,22 +134,34 @@ let lastKnownBalance = null;
                     const user = userCredential.user;
                     const accountNumber = Math.floor(1000000000 + Math.random() * 9000000000);
 
-                    const selectedCurrency = countryData[country];
+                  // Grab the selected option element from the dropdown
+        const countrySelectEl = document.getElementById('countrySelect');
+        const selectedOption = countrySelectEl.options[countrySelectEl.selectedIndex];
 
-                    await setDoc(doc(db, "users", user.uid), {
-                        name: fullName,
-                        email: email,
-                        balance: 0,
-                        accountNumber: accountNumber,
-                        accountStatus: "Inactive",
-                        accountTier: 1,
-                        kycStatus: "Not Submitted", 
-                        isVerified: false,
-                        country: country,
-                        currencySymbol: selectedCurrency.symbol,
-                        currencyCode: selectedCurrency.code,
-                        createdAt: serverTimestamp()
-                    });
+        // Extract the global dynamic values we created in Step 1
+        const currencyCode = selectedOption.dataset.code || "USD";
+        const currencySymbol = selectedOption.dataset.symbol || "$";
+
+        // SAVE TO LOCAL STORAGE SO DASHBOARD READS IT INSTANTLY FOR ANY COUNTRY!
+        localStorage.setItem('userCountry', country);
+        localStorage.setItem('userCurrencySymbol', currencySymbol);
+        localStorage.setItem('userCurrencyCode', currencyCode);
+
+        // Save cleanly to Firestore database
+        await setDoc(doc(db, "users", user.uid), {
+            name: fullName,
+            email: email,
+            balance: 0,
+            accountNumber: accountNumber,
+            accountStatus: "Inactive",
+            accountTier: 1,
+            kycStatus: "Not Submitted",
+            isVerified: false,
+            country: country,
+            currencySymbol: currencySymbol,
+            currencyCode: currencyCode,
+            createdAt: serverTimestamp()
+        });
                     
                     alert("Account Created! Redirecting to Dashboard...");
                     window.location.href = "dashboard.html";
