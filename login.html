@@ -174,60 +174,196 @@
             };
         });
 
-       async function loadCountries() {
-    const select = document.getElementById('countrySelect');
-    const currencyInput = document.getElementById('currencyDisplay');
+     async function loadCountries() {
+            const select = document.getElementById('countrySelect');
+            const currencyInput = document.getElementById('currencyDisplay') || document.getElementById('currencyInput');
 
-    if (!select) return;
+            if (!select) return;
 
-    try {
-        // Using a reliable public JSON repository that NEVER triggers CORS blocks
-        const response = await fetch('https://raw.githubusercontent.com/samayo/country-json/master/src/country-by-currency-code.json');
-        if (!response.ok) throw new Error('Network response failed');
-        const countries = await response.json();
+            // Full world dataset embedded directly to eliminate API network errors
+            const countries = [
+                { name: "Afghanistan", code: "AFN", symbol: "؋" },
+                { name: "Albania", code: "ALL", symbol: "L" },
+                { name: "Algeria", code: "DZD", symbol: "د.ج" },
+                { name: "Andorra", code: "EUR", symbol: "€" },
+                { name: "Angola", code: "AOA", symbol: "Kz" },
+                { name: "Argentina", code: "ARS", symbol: "$" },
+                { name: "Armenia", code: "AMD", symbol: "֏" },
+                { name: "Australia", code: "AUD", symbol: "$" },
+                { name: "Austria", code: "EUR", symbol: "€" },
+                { name: "Azerbaijan", code: "AZN", symbol: "₼" },
+                { name: "Bahamas", code: "BSD", symbol: "$" },
+                { name: "Bahrain", code: "BHD", symbol: ".د.ب" },
+                { name: "Bangladesh", code: "BDT", symbol: "৳" },
+                { name: "Barbados", code: "BBD", symbol: "$" },
+                { name: "Belarus", code: "BYN", symbol: "Br" },
+                { name: "Belgium", code: "EUR", symbol: "€" },
+                { name: "Belize", code: "BZD", symbol: "BZ$" },
+                { name: "Benin", code: "XOF", symbol: "CFA" },
+                { name: "Bermuda", code: "BMD", symbol: "$" },
+                { name: "Bhutan", code: "BTN", symbol: "Nu." },
+                { name: "Bolivia", code: "BOB", symbol: "$b" },
+                { name: "Bosnia and Herzegovina", code: "BAM", symbol: "KM" },
+                { name: "Botswana", code: "BWP", symbol: "P" },
+                { name: "Brazil", code: "BRL", symbol: "R$" },
+                { name: "Brunei", code: "BND", symbol: "$" },
+                { name: "Bulgaria", code: "BGN", symbol: "лв" },
+                { name: "Burkina Faso", code: "XOF", symbol: "CFA" },
+                { name: "Burundi", code: "BIF", symbol: "FBu" },
+                { name: "Cambodia", code: "KHR", symbol: "៛" },
+                { name: "Cameroon", code: "XAF", symbol: "FCFA" },
+                { name: "Canada", code: "CAD", symbol: "$" },
+                { name: "Cape Verde", code: "CVE", symbol: "$" },
+                { name: "Central African Republic", code: "XAF", symbol: "FCFA" },
+                { name: "Chad", code: "XAF", symbol: "FCFA" },
+                { name: "Chile", code: "CLP", symbol: "$" },
+                { name: "China", code: "CNY", symbol: "¥" },
+                { name: "Colombia", code: "COP", symbol: "$" },
+                { name: "Comoros", code: "KMF", symbol: "CF" },
+                { name: "Congo", code: "CDF", symbol: "FC" },
+                { name: "Costa Rica", code: "CRC", symbol: "₡" },
+                { name: "Croatia", code: "EUR", symbol: "€" },
+                { name: "Cuba", code: "CUP", symbol: "₱" },
+                { name: "Cyprus", code: "EUR", symbol: "€" },
+                { name: "Czech Republic", code: "CZK", symbol: "Kč" },
+                { name: "Denmark", code: "DKK", symbol: "kr" },
+                { name: "Djibouti", code: "DJF", symbol: "Fdj" },
+                { name: "Dominican Republic", code: "DOP", symbol: "RD$" },
+                { name: "Ecuador", code: "USD", symbol: "$" },
+                { name: "Egypt", code: "EGP", symbol: "E£" },
+                { name: "El Salvador", code: "USD", symbol: "$" },
+                { name: "Equatorial Guinea", code: "XAF", symbol: "FCFA" },
+                { name: "Estonia", code: "EUR", symbol: "€" },
+                { name: "Ethiopia", code: "ETB", symbol: "Br" },
+                { name: "Fiji", code: "FJD", symbol: "$" },
+                { name: "Finland", code: "EUR", symbol: "€" },
+                { name: "France", code: "EUR", symbol: "€" },
+                { name: "Gabon", code: "XAF", symbol: "FCFA" },
+                { name: "Gambia", code: "GMD", symbol: "D" },
+                { name: "Georgia", code: "GEL", symbol: "₾" },
+                { name: "Germany", code: "EUR", symbol: "€" },
+                { name: "Ghana", code: "GHS", symbol: "GH₵" },
+                { name: "Greece", code: "EUR", symbol: "€" },
+                { name: "Guatemala", code: "GTQ", symbol: "Q" },
+                { name: "Guinea", code: "GNF", symbol: "FG" },
+                { name: "Guyana", code: "GYD", symbol: "$" },
+                { name: "Haiti", code: "HTG", symbol: "G" },
+                { name: "Honduras", code: "HNL", symbol: "L" },
+                { name: "Hong Kong", code: "HKD", symbol: "$" },
+                { name: "Hungary", code: "HUF", symbol: "Ft" },
+                { name: "Iceland", code: "ISK", symbol: "kr" },
+                { name: "India", code: "INR", symbol: "₹" },
+                { name: "Indonesia", code: "IDR", symbol: "Rp" },
+                { name: "Iran", code: "IRR", symbol: "﷼" },
+                { name: "Iraq", code: "IQD", symbol: "ع.د" },
+                { name: "Ireland", code: "EUR", symbol: "€" },
+                { name: "Israel", code: "ILS", symbol: "₪" },
+                { name: "Italy", code: "EUR", symbol: "€" },
+                { name: "Jamaica", code: "JMD", symbol: "J$" },
+                { name: "Japan", code: "JPY", symbol: "¥" },
+                { name: "Jordan", code: "JOD", symbol: "JD" },
+                { name: "Kazakhstan", code: "KZT", symbol: "₸" },
+                { name: "Kenya", code: "KES", symbol: "KSh" },
+                { name: "Kuwait", code: "KWD", symbol: "KD" },
+                { name: "Lebanon", code: "LBP", symbol: "L£" },
+                { name: "Liberia", code: "LRD", symbol: "$" },
+                { name: "Libya", code: "LYD", symbol: "LD" },
+                { name: "Luxembourg", code: "EUR", symbol: "€" },
+                { name: "Madagascar", code: "MGA", symbol: "Ar" },
+                { name: "Malawi", code: "MWK", symbol: "MK" },
+                { name: "Malaysia", code: "MYR", symbol: "RM" },
+                { name: "Maldives", code: "MVR", symbol: "Rf" },
+                { name: "Mali", code: "XOF", symbol: "CFA" },
+                { name: "Malta", code: "EUR", symbol: "€" },
+                { name: "Mauritania", code: "MRU", symbol: "UM" },
+                { name: "Mauritius", code: "MUR", symbol: "₨" },
+                { name: "Mexico", code: "MXN", symbol: "$" },
+                { name: "Monaco", code: "EUR", symbol: "€" },
+                { name: "Mongolia", code: "MNT", symbol: "₮" },
+                { name: "Montenegro", code: "EUR", symbol: "€" },
+                { name: "Morocco", code: "MAD", symbol: "MAD" },
+                { name: "Mozambique", code: "MZN", symbol: "MT" },
+                { name: "Myanmar", code: "MMK", symbol: "Ks" },
+                { name: "Namibia", code: "NAD", symbol: "$" },
+                { name: "Nepal", code: "NPR", symbol: "₨" },
+                { name: "Netherlands", code: "EUR", symbol: "€" },
+                { name: "New Zealand", code: "NZD", symbol: "$" },
+                { name: "Nicaragua", code: "NIO", symbol: "C$" },
+                { name: "Niger", code: "XOF", symbol: "CFA" },
+                { name: "Nigeria", code: "NGN", symbol: "₦" },
+                { name: "North Korea", code: "KPW", symbol: "₩" },
+                { name: "Norway", code: "NOK", symbol: "kr" },
+                { name: "Oman", code: "OMR", symbol: "ر.ع." },
+                { name: "Pakistan", code: "PKR", symbol: "₨" },
+                { name: "Panama", code: "PAB", symbol: "B/." },
+                { name: "Paraguay", code: "PYG", symbol: "₲" },
+                { name: "Peru", code: "PEN", symbol: "S/." },
+                { name: "Philippines", code: "PHP", symbol: "₱" },
+                { name: "Poland", code: "PLN", symbol: "zł" },
+                { name: "Portugal", code: "EUR", symbol: "€" },
+                { name: "Qatar", code: "QAR", symbol: "QR" },
+                { name: "Romania", code: "RON", symbol: "lei" },
+                { name: "Russia", code: "RUB", symbol: "₽" },
+                { name: "Rwanda", code: "RWF", symbol: "FRw" },
+                { name: "Saudi Arabia", code: "SAR", symbol: "SR" },
+                { name: "Senegal", code: "XOF", symbol: "CFA" },
+                { name: "Serbia", code: "RSD", symbol: "din." },
+                { name: "Sierra Leone", code: "SLE", symbol: "Le" },
+                { name: "Singapore", code: "SGD", symbol: "$" },
+                { name: "Slovakia", code: "EUR", symbol: "€" },
+                { name: "Slovenia", code: "EUR", symbol: "€" },
+                { name: "Somalia", code: "SOS", symbol: "Sh" },
+                { name: "South Africa", code: "ZAR", symbol: "R" },
+                { name: "South Korea", code: "KRW", symbol: "₩" },
+                { name: "Spain", code: "EUR", symbol: "€" },
+                { name: "Sri Lanka", code: "LKR", symbol: "Rs" },
+                { name: "Sudan", code: "SDG", symbol: "SDG" },
+                { name: "Sweden", code: "SEK", symbol: "kr" },
+                { name: "Switzerland", code: "CHF", symbol: "CHF" },
+                { name: "Taiwan", code: "TWD", symbol: "NT$" },
+                { name: "Tanzania", code: "TZS", symbol: "TSh" },
+                { name: "Thailand", code: "THB", symbol: "฿" },
+                { name: "Togo", code: "XOF", symbol: "CFA" },
+                { name: "Tunisia", code: "TND", symbol: "DT" },
+                { name: "Turkey", code: "TRY", symbol: "₺" },
+                { name: "Uganda", code: "UGX", symbol: "USh" },
+                { name: "Ukraine", code: "UAH", symbol: "₴" },
+                { name: "United Arab Emirates", code: "AED", symbol: "AED" },
+                { name: "United Kingdom", code: "GBP", symbol: "£" },
+                { name: "United States", code: "USD", symbol: "$" },
+                { name: "Uruguay", code: "UYU", symbol: "$U" },
+                { name: "Uzbekistan", code: "UZS", symbol: "so'm" },
+                { name: "Venezuela", code: "VES", symbol: "Bs." },
+                { name: "Vietnam", code: "VND", symbol: "₫" },
+                { name: "Yemen", code: "YER", symbol: "﷼" },
+                { name: "Zambia", code: "ZMW", symbol: "ZK" },
+                { name: "Zimbabwe", code: "ZWG", symbol: "ZiG" }
+            ];
 
-        select.innerHTML = '<option value="">Select Country</option>';
-        countries.sort((a, b) => a.country.localeCompare(b.country));
+            select.innerHTML = '<option value="" disabled selected>Select Country</option>';
 
-        countries.forEach(item => {
-            if (!item.currency_code) return;
+            countries.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.name;
+                opt.textContent = item.name;
 
-            const opt = document.createElement('option');
-            opt.value = item.country;
-            opt.textContent = item.country;
-            
-            let symbol = "";
-            try {
-                const formatter = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: item.currency_code
-                });
-                symbol = formatter.formatToParts(0).find(part => part.type === 'currency').value;
-            } catch (e) {
-                symbol = item.currency_code;
-            }
+                opt.dataset.code = item.code;
+                opt.dataset.symbol = item.symbol;
+                opt.dataset.currency = `${item.code} (${item.symbol})`;
 
-            opt.dataset.code = item.currency_code;
-            opt.dataset.symbol = symbol;
-            opt.dataset.currency = `${item.currency_code} (${symbol})`;
-            
-            select.appendChild(opt);
-        });
+                select.appendChild(opt);
+            });
 
-        select.onchange = () => {
-            const selected = select.options[select.selectedIndex];
-            if (currencyInput && selected && selected.dataset.currency) {
-                currencyInput.value = selected.dataset.currency;
-            } else if (currencyInput) {
-                currencyInput.value = "";
-            }
-        };
+            select.onchange = () => {
+                const selected = select.options[select.selectedIndex];
+                if (currencyInput && selected && selected.dataset.currency) {
+                    currencyInput.value = selected.dataset.currency;
+                } else if (currencyInput) {
+                    currencyInput.value = "";
+                }
+            };
+        }
 
-    } catch (error) {
-        console.error("Failed to load countries:", error);
-        select.innerHTML = '<option value="">Error loading countries</option>';
-    }
-}
         loadCountries();
 
         let isLogin = false;
